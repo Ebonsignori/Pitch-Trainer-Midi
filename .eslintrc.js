@@ -30,6 +30,7 @@ module.exports = {
       imports: 'only-multiline',
       exports: 'only-multiline',
       functions: 'never'
-    }]
+    }],
+    'react/prop-types': 0
   }
 }

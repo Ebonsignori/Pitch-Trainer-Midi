@@ -1,9 +1,9 @@
+require('dotenv').config()
 const webpack = require('webpack')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { spawn } = require('child_process')
 
-// Any directories you will be adding code/files into, need to be added to this array so webpack will pick them up
 const defaultInclude = path.resolve(__dirname, 'src')
 
 module.exports = {
@@ -24,11 +24,18 @@ module.exports = {
         use: [{ loader: 'file-loader?name=font/[name]__[hash:base64:5].[ext]' }],
         include: defaultInclude,
       },
+      {
+        test: /\.worker\.js$/,
+        use: {
+          loader: 'worker-loader',
+          options: { inline: 'fallback' }
+        }
+      }
     ],
   },
   target: 'electron-renderer',
   plugins: [
-    new HtmlWebpackPlugin({ title: 'New app title ' }),
+    new HtmlWebpackPlugin({ title: 'Pitch Trainer (midi)' }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development'),
     }),

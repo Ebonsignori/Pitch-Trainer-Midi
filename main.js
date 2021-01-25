@@ -1,5 +1,6 @@
 // Import parts of electron to use
-const { app, BrowserWindow } = require('electron')
+require('dotenv').config()
+const { app, BrowserWindow, screen } = require('electron')
 const path = require('path')
 const url = require('url')
 
@@ -7,9 +8,7 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-// Keep a reference for dev mode
 let dev = false
-
 if (process.env.NODE_ENV !== undefined && process.env.NODE_ENV === 'development') {
   dev = true
 }
@@ -22,10 +21,11 @@ if (process.platform === 'win32') {
 }
 
 function createWindow () {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768,
+    width: width,
+    height: height,
     show: false,
     webPreferences: {
       nodeIntegration: true,
@@ -41,6 +41,7 @@ function createWindow () {
       host: 'localhost:8080',
       pathname: 'index.html',
       slashes: true,
+      // resizable: true,
     })
   } else {
     indexPath = url.format({
