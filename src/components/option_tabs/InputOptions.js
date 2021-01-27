@@ -59,8 +59,14 @@ function InputOptions () {
   const [microphoneLoading, setMicrophoneLoading] = useState(false)
 
   const inputDeviceSelected = getSelectedSetting(appState.inputDeviceOpt)
-  console.log(inputDeviceSelected)
   const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true)
+
+  const refreshInputs = () => {
+    microphone = null
+    devices = null
+    setDevicesLoading(true)
+    setMicrophoneLoading(true)
+  }
 
   // Async fetch and populate mic input device options
   if (!devices) {
@@ -146,6 +152,7 @@ function InputOptions () {
   return (
         <GlobalSettingsWrapper>
           <RadioForm title='Input Engine' stateValues={appState.inputDeviceOpt} setValues={appState.setInputDeviceOpt} />
+          <GreenBtn onClick={() => refreshInputs()}>Refresh Inputs</GreenBtn>
           {DeviceOptions}
         </GlobalSettingsWrapper>
   )

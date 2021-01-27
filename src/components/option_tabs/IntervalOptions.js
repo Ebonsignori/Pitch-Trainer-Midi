@@ -56,10 +56,8 @@ const ExplanatoryText = styled.div`
   justify-content: start;
 `
 
-let intervalRenders = 0
 function IntervalOptions () {
   const appState = useContext(AppContext)
-  console.log('IntervalOptions renders', intervalRenders++)
   return (
     <SelectedTabWrapper>
       {}

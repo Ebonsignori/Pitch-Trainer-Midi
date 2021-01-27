@@ -43,7 +43,6 @@ function DropdownForm ({
   setValues,
   isCompound,
 }) {
-  console.log(stateValues)
   const [hidden, setHidden] = useState(true)
   if (!stateValues) {
     stateValues = {}

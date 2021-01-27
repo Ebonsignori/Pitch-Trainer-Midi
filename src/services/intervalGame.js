@@ -18,8 +18,6 @@ export default class IntervalGame {
     Tone.Transport.timeSignature = 4
 
     this.instrument = getPiano()
-    console.log('here!')
-    console.log(this.instrument)
 
     this.currentNoteIndex = 0
     this.lowestNote = getSelectedSetting(appState.lowerRangesOpt)
@@ -199,7 +197,6 @@ export default class IntervalGame {
   async playNotes () {
     await Tone.loaded()
     this.instrument.sync()
-    console.log(this.instrument)
     const now = Tone.now()
     let finalNoteTime = now + this.gain.toSeconds('4n')
     let song = [

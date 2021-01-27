@@ -9,7 +9,6 @@ NOTE_OPTS.forEach(note => {
 let piano = null
 let prevPianoType = null
 export function getPiano (pianoType = 'SoftPiano') {
-  console.log('here!')
   if (piano && prevPianoType === pianoType) {
     return piano
   }

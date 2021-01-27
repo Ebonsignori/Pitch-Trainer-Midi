@@ -48,7 +48,17 @@ export default class Microphone {
     if (this._init) {
       return true
     }
-    this.sourceStream = await getSourceStream(this.deviceId)
+    try {
+      this.sourceStream = await getSourceStream(this.deviceId)
+    } catch (error) {
+      console.error(error)
+    }
+    try {
+      this.sourceStream = await getSourceStream('default')
+    } catch (error) {
+      // TODO: Error module and close
+      return
+    }
     this._init = true
     return true
   }
