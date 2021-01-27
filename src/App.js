@@ -32,13 +32,13 @@ function App () {
   const [repeatPreviewCountOpt, setRepeatPreviewCountOpt] = useState(REPEAT_PREVIEW_COUNT_OPTS)
   const [startNoteDisplayOpt, setStartNoteDisplayOpt] = useState(START_NOTE_DISPLAY_SELECTED)
   const [autoContinueCorrectOpt, setAutoContinueCorrectOpt] = useState(true)
-  const [autoContinueCorrectDelayOpt, setAutoContinueCorrectDelayOpt] = useState(3)
+  const [autoContinueCorrectDelayOpt, setAutoContinueCorrectDelayOpt] = useState(2)
   const [autoContinueWrongOpt, setAutoContinueWrongOpt] = useState(true)
-  const [autoContinueWrongDelayOpt, setAutoContinueWrongDelayOpt] = useState(3)
+  const [autoContinueWrongDelayOpt, setAutoContinueWrongDelayOpt] = useState(2)
   const [repeatOnWrongOpt, setRepeatOnWrongOpt] = useState(true)
 
   // Game tab-level settings
-  const [numberOfQuestionsOpt, setNumberOfQuestionsOpt] = useState(20)
+  const [numberOfQuestionsOpt, setNumberOfQuestionsOpt] = useState(50)
   const [intervalsOpt, setIntervalsOpt] = useState(INTERVALS_SELECTED)
   const [playModesOpt, setPlayModesOpt] = useState(PLAY_MODES_SELECTED)
   const [fixedRootOpt, setFixedRootOpt] = useState(FIXED_ROOT)

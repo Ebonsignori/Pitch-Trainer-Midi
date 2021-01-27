@@ -3,13 +3,12 @@ import styled from 'styled-components'
 import { Piano } from 'react-piano'
 import { PianoStyle } from './note_display/pianoStyle'
 import AppContext from '../AppContext'
-import { ANSWERED_STATE, GAME_OPTIONS, INTERVALS, LISTENING_STATE, PLAYING_STATE, RESULTS, RESULTS_STATE } from '../constants/gameConstants'
+import { ANSWERED_STATE, INTERVALS, LISTENING_STATE, PLAYING_STATE, RESULTS } from '../constants/gameConstants'
 import { ASCENDING, INFINITE, MICROPHONE_DEVICE, PIANO_DISPLAY, SHEET_MUSIC_DISPLAY } from '../constants/settingsConstants'
 import { THEME_SPLASH_COLOR } from '../constants/styleConstants'
 import IntervalGame from '../services/intervalGame'
 import { GreenBtn, RedBtn, ThemeBtn } from './Buttons'
 import SheetMusic from './note_display/SheetMusic'
-import Results from './Results'
 import { Note } from '@tonaljs/tonal'
 import Microphone from '../utils/microphone'
 import { getSelectedSetting } from '../utils/settings'
@@ -178,7 +177,7 @@ function Game () {
   const [repeating, setRepeating] = useState(null)
 
   const totalAnswered = numberCorrect + numberWrong
-  const isTheEnd = gameState === RESULTS_STATE ||
+  const isTheEnd = gameState === RESULTS ||
      (appState.numberOfQuestionsOpt !== INFINITE && totalAnswered >= appState.numberOfQuestionsOpt)
   const isQuestionBeforeLast = (appState.numberOfQuestionsOpt !== INFINITE &&
       numberWrong + numberCorrect + 1 >= appState.numberOfQuestionsOpt)
@@ -399,7 +398,7 @@ function Game () {
         {NextBtnDisplay}
       </ButtonsRow>
       <ButtonsRow>
-        <RedBtn onClick={() => setGameState(RESULTS_STATE)}>End</RedBtn>
+        <RedBtn onClick={() => setGameState(RESULTS)}>End</RedBtn>
       </ButtonsRow>
       {MidiPianoDisplay}
     </PageWrapper>

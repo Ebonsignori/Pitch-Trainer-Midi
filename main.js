@@ -3,6 +3,9 @@ require('dotenv').config()
 const { app, BrowserWindow, screen } = require('electron')
 const path = require('path')
 const url = require('url')
+const serve = require('electron-serve')
+
+const loadURL = serve({ directory: 'static' })
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -31,6 +34,8 @@ function createWindow () {
       nodeIntegration: true,
     },
   })
+
+  loadURL(mainWindow)
 
   // and load the index.html of the app.
   let indexPath

@@ -1,8 +1,8 @@
 import { Collection, Interval, Note, Range } from '@tonaljs/tonal'
 import * as Tone from 'tone'
-import { ANSWERED_STATE, LISTENING_STATE, PLAYING_STATE, RESULTS_STATE } from '../constants/gameConstants'
+import { ANSWERED_STATE, LISTENING_STATE, PLAYING_STATE, RESULTS } from '../constants/gameConstants'
 import { ASCENDING, DESCENDING, HARMONIC, INTERVAL_TO_SEMITONE_MAP, NOT_FIXED_ROOT, SEMITONE_TO_INTERVAL_MAP } from '../constants/settingsConstants'
-import { piano } from '../utils/piano'
+import { getPiano } from '../utils/instruments'
 import { getSelectedSetting, getSelectedSettings } from '../utils/settings'
 
 export default class IntervalGame {
@@ -16,6 +16,10 @@ export default class IntervalGame {
     // Set up Tone.js
     Tone.Transport.bpm.value = appState.tempoOpt || 80
     Tone.Transport.timeSignature = 4
+
+    this.instrument = getPiano()
+    console.log('here!')
+    console.log(this.instrument)
 
     this.currentNoteIndex = 0
     this.lowestNote = getSelectedSetting(appState.lowerRangesOpt)
@@ -102,12 +106,12 @@ export default class IntervalGame {
   async onNext () {
     let wasResultState = false
     const currentState = await this.getCurrentState()
-    if (currentState === RESULTS_STATE) {
+    if (currentState === RESULTS) {
       return
     }
     this.stopNotes()
     this.setGameState((prevState) => {
-      if (prevState !== RESULTS_STATE) {
+      if (prevState !== RESULTS) {
         return PLAYING_STATE
       } else {
         wasResultState = true
@@ -119,7 +123,7 @@ export default class IntervalGame {
     this.pickInterval()
     await this.playNotes()
     this.setGameState((prevState) => {
-      if (prevState !== RESULTS_STATE) {
+      if (prevState !== RESULTS) {
         return LISTENING_STATE
       } else {
         wasResultState = true
@@ -138,7 +142,7 @@ export default class IntervalGame {
   async onReplay (doNotUpdateState, repeatMessage = 'Repeating...') {
     let wasResultState = false
     const currentState = await this.getCurrentState()
-    if (currentState === PLAYING_STATE || currentState === RESULTS_STATE) {
+    if (currentState === PLAYING_STATE || currentState === RESULTS) {
       return
     }
     this.stopNotes()
@@ -149,7 +153,7 @@ export default class IntervalGame {
         if (prevState === ANSWERED_STATE) {
           atAnswered = true
         }
-        if (prevState !== RESULTS_STATE) {
+        if (prevState !== RESULTS) {
           return PLAYING_STATE
         } else {
           wasResultState = true
@@ -164,7 +168,7 @@ export default class IntervalGame {
       this.setGameState((prevState) => {
         if (atAnswered) {
           return ANSWERED_STATE
-        } else if (prevState !== RESULTS_STATE) {
+        } else if (prevState !== RESULTS) {
           return LISTENING_STATE
         } else {
           wasResultState = true
@@ -194,7 +198,8 @@ export default class IntervalGame {
 
   async playNotes () {
     await Tone.loaded()
-    piano.sync()
+    this.instrument.sync()
+    console.log(this.instrument)
     const now = Tone.now()
     let finalNoteTime = now + this.gain.toSeconds('4n')
     let song = [
@@ -216,7 +221,7 @@ export default class IntervalGame {
       finalNoteTime = now + this.gain.toSeconds('2n')
     }
     for (const element of song) {
-      piano.triggerAttackRelease(element.note, element.duration, element.time)
+      this.instrument.triggerAttackRelease(element.note, element.duration, element.time)
     }
 
     const donePlaying = new Promise((resolve, reject) => {

@@ -56,7 +56,7 @@ export const START_NOTE_DISPLAY_SELECTED = {
 // Intervals
 export const MINOR_2ND = 'Minor 2nd'
 export const MAJOR_2ND = 'Major 2nd'
-export const MINOR_3RD = 'Minor 2nd'
+export const MINOR_3RD = 'Minor 3rd'
 export const MAJOR_3RD = 'Major 3nd'
 export const PERFECT_4TH = 'Perfect 4th'
 export const DIM_5TH = 'Dim 5th'
