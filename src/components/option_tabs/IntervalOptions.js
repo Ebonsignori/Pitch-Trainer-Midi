@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import AppContext from '../../AppContext'
 import CheckboxForm from '../forms/CheckboxForm'
@@ -7,6 +7,7 @@ import { GreenBtn } from '../Buttons'
 import { THEME_BORDER_COLOR } from '../../constants/styleConstants'
 import { INTERVALS } from '../../constants/gameConstants'
 import NumberForm from '../forms/NumberForm'
+import { saveAllSettings } from '../../utils/settings'
 
 const SelectedTabWrapper = styled.div`
   display: flex;
@@ -55,10 +56,13 @@ const ExplanatoryText = styled.div`
   justify-content: start;
 `
 
+let intervalRenders = 0
 function IntervalOptions () {
   const appState = useContext(AppContext)
+  console.log('IntervalOptions renders', intervalRenders++)
   return (
     <SelectedTabWrapper>
+      {}
       <SelectedTabRow>
         <ExplanationWrapper>
           <ExplanatoryTitle>
@@ -88,7 +92,10 @@ function IntervalOptions () {
         </SelectedTabColumn>
       </SelectedTabRow>
       <SelectedTabRow style={{ marginLeft: '3vw' }}>
-        <GreenBtn onClick={() => appState.setSelectedGameMode(INTERVALS)} >Start Interval Mode</GreenBtn>
+        <GreenBtn onClick={() => {
+          saveAllSettings(appState)
+          appState.setSelectedGameMode(INTERVALS)
+        }}>Start Interval Mode</GreenBtn>
       </SelectedTabRow>
     </SelectedTabWrapper>
   )

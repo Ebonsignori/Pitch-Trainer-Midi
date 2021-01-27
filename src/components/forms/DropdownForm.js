@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import styled from 'styled-components'
 import { Button } from 'styled-button-component'
 import {
@@ -6,7 +6,7 @@ import {
   DropdownItem,
   DropdownMenu,
 } from 'styled-dropdown-component'
-import { getSelectedSetting } from '../../utils/settings'
+import { getSelectedSetting, settingChanged } from '../../utils/settings'
 import { THEME_BORDER_COLOR, THEME_SPLASH_COLOR } from '../../constants/styleConstants'
 
 const Wrapper = styled.div`
@@ -43,7 +43,11 @@ function DropdownForm ({
   setValues,
   isCompound,
 }) {
+  console.log(stateValues)
   const [hidden, setHidden] = useState(true)
+  if (!stateValues) {
+    stateValues = {}
+  }
 
   const onOptionSelect = (option) => {
     setHidden(true)
@@ -88,4 +92,9 @@ function DropdownForm ({
   )
 }
 
-export default DropdownForm
+export default memo(DropdownForm, (prev, next) => {
+  if (settingChanged(prev.stateValues, next.stateValues)) {
+    return false
+  }
+  return true
+})

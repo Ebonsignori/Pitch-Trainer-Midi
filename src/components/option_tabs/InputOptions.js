@@ -59,6 +59,7 @@ function InputOptions () {
   const [microphoneLoading, setMicrophoneLoading] = useState(false)
 
   const inputDeviceSelected = getSelectedSetting(appState.inputDeviceOpt)
+  console.log(inputDeviceSelected)
   const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true)
 
   // Async fetch and populate mic input device options
@@ -127,7 +128,7 @@ function InputOptions () {
 
   let DeviceOptions = (
     <>
-      <DropdownForm title='Midi Device' stateValues={appState.midiDeviceOpt || {}} setValues={appState.setMidiDeviceOpt} />
+      <DropdownForm title='Midi Device' stateValues={appState.midiDeviceOpt} setValues={appState.setMidiDeviceOpt} />
       <ToggleForm title='Show MIDI piano' stateValue={appState.showMidiPianoOpt} setValue={appState.setShowMidiPianoOpt} />
     </>
   )
@@ -136,7 +137,7 @@ function InputOptions () {
       <>
         {devicesLoading
           ? 'Loading mic devices...'
-          : <DropdownForm isCompound title='Microphone Device' stateValues={appState.micDeviceOpt || {}} setValues={appState.setMicDeviceOpt} />
+          : <DropdownForm isCompound title='Microphone Device' stateValues={appState.micDeviceOpt} setValues={appState.setMicDeviceOpt} />
         }
         {MicPreviewRender}
       </>

@@ -14,36 +14,40 @@ import {
 } from './constants/settingsConstants'
 import { GAME_OPTIONS, INTERVALS, RESULTS } from './constants/gameConstants'
 import Results from './components/Results'
+import { loadSettingsJson } from './utils/settings'
+
+const existingSettings = loadSettingsJson()
 
 function App () {
   const [selectedGameMode, setSelectedGameMode] = useState(GAME_OPTIONS)
   // const [selectedGameMode, setSelectedGameMode] = useState(INTERVALS)
 
   // Input settings
-  const [inputDeviceOpt, setInputDeviceOpt] = useState(INPUT_DEVICE_SELECTED)
-  const [midiDeviceOpt, setMidiDeviceOpt] = useState(null)
-  const [micDeviceOpt, setMicDeviceOpt] = useState({
+  const [inputDeviceOpt, setInputDeviceOpt] = useState(existingSettings.inputDeviceOpt || INPUT_DEVICE_SELECTED)
+  const [midiDeviceOpt, setMidiDeviceOpt] = useState(existingSettings.midiDeviceOpt || null)
+  const [micDeviceOpt, setMicDeviceOpt] = useState(existingSettings.micDeviceOpt || {
     'default#default': true
   })
-  const [showMidiPianoOpt, setShowMidiPianoOpt] = useState(true)
+  const [showMidiPianoOpt, setShowMidiPianoOpt] = useState(existingSettings.showMidiPianoOpt || true)
+  const [showPlayedMicNote, setShowPlayedMicNote] = useState(existingSettings.showPlayedMicNote || true)
 
   // Global game settings
-  const [tempoOpt, setTempoOpt] = useState(80)
-  const [repeatPreviewCountOpt, setRepeatPreviewCountOpt] = useState(REPEAT_PREVIEW_COUNT_OPTS)
-  const [startNoteDisplayOpt, setStartNoteDisplayOpt] = useState(START_NOTE_DISPLAY_SELECTED)
-  const [autoContinueCorrectOpt, setAutoContinueCorrectOpt] = useState(true)
-  const [autoContinueCorrectDelayOpt, setAutoContinueCorrectDelayOpt] = useState(2)
-  const [autoContinueWrongOpt, setAutoContinueWrongOpt] = useState(true)
-  const [autoContinueWrongDelayOpt, setAutoContinueWrongDelayOpt] = useState(2)
-  const [repeatOnWrongOpt, setRepeatOnWrongOpt] = useState(true)
+  const [tempoOpt, setTempoOpt] = useState(existingSettings.tempoOpt || 80)
+  const [repeatPreviewCountOpt, setRepeatPreviewCountOpt] = useState(existingSettings.repeatPreviewCountOpt || REPEAT_PREVIEW_COUNT_OPTS)
+  const [startNoteDisplayOpt, setStartNoteDisplayOpt] = useState(existingSettings.startNoteDisplayOpt || START_NOTE_DISPLAY_SELECTED)
+  const [autoContinueCorrectOpt, setAutoContinueCorrectOpt] = useState(existingSettings.autoContinueCorrectOpt || true)
+  const [autoContinueCorrectDelayOpt, setAutoContinueCorrectDelayOpt] = useState(existingSettings.autoContinueCorrectDelayOpt || 2)
+  const [autoContinueWrongOpt, setAutoContinueWrongOpt] = useState(existingSettings.autoContinueWrongOpt || true)
+  const [autoContinueWrongDelayOpt, setAutoContinueWrongDelayOpt] = useState(existingSettings.autoContinueWrongDelayOpt || 2)
+  const [repeatOnWrongOpt, setRepeatOnWrongOpt] = useState(existingSettings.repeatOnWrongOpt || true)
 
   // Game tab-level settings
-  const [numberOfQuestionsOpt, setNumberOfQuestionsOpt] = useState(50)
-  const [intervalsOpt, setIntervalsOpt] = useState(INTERVALS_SELECTED)
-  const [playModesOpt, setPlayModesOpt] = useState(PLAY_MODES_SELECTED)
-  const [fixedRootOpt, setFixedRootOpt] = useState(FIXED_ROOT)
-  const [upperRangesOpt, setUpperRangesOpt] = useState(UPPER_RANGE)
-  const [lowerRangesOpt, setLowerRangesOpt] = useState(LOWER_RANGE)
+  const [numberOfQuestionsOpt, setNumberOfQuestionsOpt] = useState(existingSettings.numberOfQuestionsOpt || 50)
+  const [intervalsOpt, setIntervalsOpt] = useState(existingSettings.intervalsOpt || INTERVALS_SELECTED)
+  const [playModesOpt, setPlayModesOpt] = useState(existingSettings.playModesOpt || PLAY_MODES_SELECTED)
+  const [fixedRootOpt, setFixedRootOpt] = useState(existingSettings.fixedRootOpt || FIXED_ROOT)
+  const [upperRangesOpt, setUpperRangesOpt] = useState(existingSettings.upperRangesOpt || UPPER_RANGE)
+  const [lowerRangesOpt, setLowerRangesOpt] = useState(existingSettings.lowerRangesOpt || LOWER_RANGE)
 
   // Game results
   const [gameStats, setGameStats] = useState({})
@@ -59,6 +63,8 @@ function App () {
     setMicDeviceOpt,
     showMidiPianoOpt,
     setShowMidiPianoOpt,
+    showPlayedMicNote,
+    setShowPlayedMicNote,
     tempoOpt,
     setTempoOpt,
     repeatPreviewCountOpt,
