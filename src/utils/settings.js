@@ -3,7 +3,8 @@ const path = require('path')
 const fs = require('fs')
 
 const { APP_NAME } = process.env
-const SETTINGS_FILE = path.join(homedir, APP_NAME, 'settings.json')
+const SETTINGS_DIRECTORY = path.join(homedir, APP_NAME)
+const SETTINGS_FILE = path.join(SETTINGS_DIRECTORY, 'settings.json')
 
 const SETTINGS_KEYS = [
   'inputDeviceOpt',
@@ -58,6 +59,7 @@ export function loadSettingsJson () {
 // Save settings to default JSON file
 function setSettingsJson (newSettings) {
   try {
+    fs.mkdirSync(SETTINGS_DIRECTORY, { recursive: true })
     fs.writeFileSync(SETTINGS_FILE, JSON.stringify(newSettings))
   } catch (error) {
     console.error(`Unable to read settings file at ${SETTINGS_FILE}`, error)
