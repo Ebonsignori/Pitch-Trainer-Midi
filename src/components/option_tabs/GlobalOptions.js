@@ -4,7 +4,6 @@ import RadioForm from '../forms/RadioForm'
 import NumberForm from '../forms/NumberForm'
 import ToggleForm from '../forms/ToggleForm'
 import { THEME_BORDER_COLOR } from '../../constants/styleConstants'
-import DropdownForm from '../forms/DropdownForm'
 import AppContext from '../../AppContext'
 
 const GlobalSettingsWrapper = styled.div`
@@ -12,12 +11,39 @@ const GlobalSettingsWrapper = styled.div`
   max-height: 95vh;
   min-height: 95vh;
   overflow-y: auto;
+  padding: 1vw;
+`
+
+const ExplanationWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1vw;
+`
+
+const ExplanatoryTitle = styled.div`
+  font-size: 1.8vw;
+  font-weight: 600;
+  align-items: center;
+  margin-bottom: 1vw;
+`
+
+const ExplanatoryText = styled.div`
+  font-size: 1.5vw;
+  align-items: center;
 `
 
 function GlobalOptions () {
   const appState = useContext(AppContext)
   return (
         <GlobalSettingsWrapper>
+          <ExplanationWrapper>
+            <ExplanatoryTitle>
+              Global Options
+            </ExplanatoryTitle>
+            <ExplanatoryText>
+              Options that apply to each game mode.
+            </ExplanatoryText>
+          </ExplanationWrapper>
           <NumberForm title='Tempo' units='BPM' stateValue={appState.tempoOpt} setValue={appState.setTempoOpt} min={15} max={300} />
           <RadioForm title='Starting Note Display' stateValues={appState.startNoteDisplayOpt} setValues={appState.setStartNoteDisplayOpt} />
           <ToggleForm title='Auto Continue on Correct' stateValue={appState.autoContinueCorrectOpt} setValue={appState.setAutoContinueCorrectOpt} />
@@ -31,7 +57,7 @@ function GlobalOptions () {
             : null
           }
           <ToggleForm title='Repeat on Wrong' stateValue={appState.repeatOnWrongOpt} setValue={appState.setRepeatOnWrongOpt} />
-          <DropdownForm title='Repeat Preview Count' stateValues={appState.repeatPreviewCountOpt} setValues={appState.setRepeatPreviewCountOpt} />
+          <NumberForm title='Repeat Preview Count' stateValue={appState.repeatPreviewCountOpt} setValue={appState.setRepeatPreviewCountOpt} min={0} max={10} />
         </GlobalSettingsWrapper>
   )
 }

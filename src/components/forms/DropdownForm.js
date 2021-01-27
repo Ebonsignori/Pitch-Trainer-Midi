@@ -30,10 +30,26 @@ const ButtonStyled = styled(Button)`
   border-color: ${THEME_BORDER_COLOR}
 `
 
+const DropdownStyled = styled(Dropdown)`
+  div {
+    max-height: 20vh;
+    overflow: auto;
+  }
+`
+
 const DropdownItemStyled = styled(DropdownItem)`
+  ${props => props.active && `
+    background-color: ${THEME_SPLASH_COLOR};
+    :hover {
+      opacity: 1 !important;
+      background-color: ${THEME_SPLASH_COLOR} !important;
+      cursor: default !important;
+    }
+  `}
   :hover {
     opacity: .8;
-    background-color: ${THEME_BORDER_COLOR}
+    background-color: ${THEME_BORDER_COLOR};
+    cursor: pointer;
   }
 `
 
@@ -68,6 +84,8 @@ function DropdownForm ({
         onClick={() => onOptionSelect(entry[0])}
         active={entry[1]}
         colorHoverFocus={THEME_BORDER_COLOR}
+        backgroundColorActive={THEME_SPLASH_COLOR}
+        colorActive='white'
       >
         {isCompound ? entry[0].substring(0, entry[0].indexOf('#')) : entry[0]}
       </DropdownItemStyled>
@@ -79,14 +97,14 @@ function DropdownForm ({
   return (
     <Wrapper>
       <Title>{title}</Title>
-      <Dropdown>
+      <DropdownStyled>
         <ButtonStyled dropdownToggle onClick={() => setHidden(!hidden)}>
           {isCompound ? selectedSetting.substring(0, selectedSetting.indexOf('#')) : selectedSetting}
         </ButtonStyled>
         <DropdownMenu hidden={hidden} toggle={() => setHidden(!hidden)}>
           {Options}
         </DropdownMenu>
-      </Dropdown>
+      </DropdownStyled>
     </Wrapper>
   )
 }

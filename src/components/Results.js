@@ -81,7 +81,7 @@ function Results ({
   if (numberOfQuestionsOpt !== INFINITE) {
     questionsDisplay = `${totalAnswered} out of ${numberOfQuestionsOpt} answered`
   }
-  const percentCorrect = Math.round((numberCorrect / numberOfQuestionsOpt) * 100) / 100
+  const percentCorrect = Math.round((numberCorrect / numberOfQuestionsOpt) * 10000) / 100
   return (
     <PageWrapper>
       <TitleRow>

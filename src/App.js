@@ -3,14 +3,13 @@ import Game from './components/Game'
 import Options from './components/Options'
 import AppContext from './AppContext'
 import {
-  REPEAT_PREVIEW_COUNT_OPTS,
-  START_NOTE_DISPLAY_SELECTED,
   INTERVALS_SELECTED,
   PLAY_MODES_SELECTED,
   FIXED_ROOT,
   UPPER_RANGE,
   LOWER_RANGE,
   INPUT_DEVICE_SELECTED,
+  START_NOTE_DISPLAY_SELECTED,
 } from './constants/settingsConstants'
 import { GAME_OPTIONS, INTERVALS, RESULTS } from './constants/gameConstants'
 import Results from './components/Results'
@@ -30,10 +29,14 @@ function App () {
   })
   const [showMidiPianoOpt, setShowMidiPianoOpt] = useState(existingSettings.showMidiPianoOpt || true)
   const [showPlayedMicNote, setShowPlayedMicNote] = useState(existingSettings.showPlayedMicNote || true)
+  // Output settings
+  const [outputSoundsOpt, setOutputSoundsOpt] = useState(existingSettings.outputSoundsOpt || {
+    'Steinway Grand Piano#steinway_grand_piano': true,
+  })
 
   // Global game settings
   const [tempoOpt, setTempoOpt] = useState(existingSettings.tempoOpt || 80)
-  const [repeatPreviewCountOpt, setRepeatPreviewCountOpt] = useState(existingSettings.repeatPreviewCountOpt || REPEAT_PREVIEW_COUNT_OPTS)
+  const [repeatPreviewCountOpt, setRepeatPreviewCountOpt] = useState(existingSettings.repeatPreviewCountOpt || 0)
   const [startNoteDisplayOpt, setStartNoteDisplayOpt] = useState(existingSettings.startNoteDisplayOpt || START_NOTE_DISPLAY_SELECTED)
   const [autoContinueCorrectOpt, setAutoContinueCorrectOpt] = useState(existingSettings.autoContinueCorrectOpt || true)
   const [autoContinueCorrectDelayOpt, setAutoContinueCorrectDelayOpt] = useState(existingSettings.autoContinueCorrectDelayOpt || 2)
@@ -65,6 +68,8 @@ function App () {
     setShowMidiPianoOpt,
     showPlayedMicNote,
     setShowPlayedMicNote,
+    outputSoundsOpt,
+    setOutputSoundsOpt,
     tempoOpt,
     setTempoOpt,
     repeatPreviewCountOpt,

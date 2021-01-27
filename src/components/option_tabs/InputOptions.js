@@ -15,12 +15,30 @@ const GlobalSettingsWrapper = styled.div`
   max-height: 95vh;
   min-height: 95vh;
   overflow-y: auto;
+  padding: 1vw;
+`
+
+const ExplanationWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1vw;
+`
+
+const ExplanatoryTitle = styled.div`
+  font-size: 1.8vw;
+  font-weight: 600;
+  align-items: center;
+  margin-bottom: 1vw;
+`
+
+const ExplanatoryText = styled.div`
+  font-size: 1.5vw;
+  align-items: center;
 `
 
 const PreviewWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin-top: 2vh;
 `
 const PreviewTitle = styled.div`
   display: flex;
@@ -46,7 +64,7 @@ const NotePreview = styled.div`
   font-size: ${props => props.listening ? '3.5vw' : '1vw'};
   color: ${THEME_SPLASH_COLOR};
   font-weight: 600;
-  margin-top: 4vh;
+  margin-top: 2vh;
 `
 
 let microphone
@@ -124,8 +142,8 @@ function InputOptions () {
           <PreviewSubText>{'If note doesn\'t match, try tuning your instrument, trying another device, or switching to Midi.'}</PreviewSubText>
           <NotePreview listening={NotePreviewRender !== 'Listening...' && NotePreviewRender !== 'Not Listening'}>{NotePreviewRender}</NotePreview>
           {!isListening
-            ? <GreenBtn onClick={() => microphone.listen()}>Listen</GreenBtn>
-            : <RedBtn onClick={() => microphone.stop()}>Stop Listening</RedBtn>
+            ? <GreenBtn small onClick={() => microphone.listen()}>Listen</GreenBtn>
+            : <RedBtn small onClick={() => microphone.stop()}>Stop Listening</RedBtn>
           }
         </PreviewWrapper>
       )
@@ -143,7 +161,12 @@ function InputOptions () {
       <>
         {devicesLoading
           ? 'Loading mic devices...'
-          : <DropdownForm isCompound title='Microphone Device' stateValues={appState.micDeviceOpt} setValues={appState.setMicDeviceOpt} />
+          : (
+            <>
+            <DropdownForm isCompound title='Microphone Device' stateValues={appState.micDeviceOpt} setValues={appState.setMicDeviceOpt} />
+            <GreenBtn small onClick={() => refreshInputs()}>Refresh Inputs</GreenBtn>
+            </>
+            )
         }
         {MicPreviewRender}
       </>
@@ -151,8 +174,15 @@ function InputOptions () {
   }
   return (
         <GlobalSettingsWrapper>
+          <ExplanationWrapper>
+            <ExplanatoryTitle>
+              Instrument Options
+            </ExplanatoryTitle>
+            <ExplanatoryText>
+              Input and playback instrument options.
+            </ExplanatoryText>
+          </ExplanationWrapper>
           <RadioForm title='Input Engine' stateValues={appState.inputDeviceOpt} setValues={appState.setInputDeviceOpt} />
-          <GreenBtn onClick={() => refreshInputs()}>Refresh Inputs</GreenBtn>
           {DeviceOptions}
         </GlobalSettingsWrapper>
   )

@@ -9,10 +9,10 @@ import InputOptions from './option_tabs/InputOptions'
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  min-width: 100vw;
-  min-height: 100vh;
-  max-width: 100vw;
-  max-height: 100vh;
+  min-width: 98vw;
+  min-height: 98vh;
+  max-width: 98vw;
+  max-height: 98vh;
   overflow: hidden;
 `
 
@@ -21,18 +21,6 @@ const LeftPageWrapper = styled.div`
   flex-direction: column;
   min-width: 30vw;
   max-width: 30vw;
-`
-
-const AppTitle = styled.div`
-  display: flex;
-  font-size: 2.5vw;
-  color: ${THEME_SPLASH_COLOR};
-  min-height: 5vh;
-  max-height: 5vh;
-  min-width: 100%;
-  align-items: center;
-  min-width: 10vw;
-  padding-left: 10px;
 `
 
 const TabSettingsWrapper = styled.div`
@@ -95,7 +83,6 @@ function Options () {
   return (
     <PageWrapper>
       <LeftPageWrapper>
-        <AppTitle>Game Options</AppTitle>
         <TabsWrapper>
           <Tab
             selected={globalOptionsTab === GLOBAL_OPTIONS}

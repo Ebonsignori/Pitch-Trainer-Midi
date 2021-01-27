@@ -18,18 +18,12 @@ export const INPUT_DEVICE_SELECTED = {
 }
 
 // - - - - - -
+// Output Settings
+// - - - - - -
+
+// - - - - - -
 // Global settings
 // - - - - - -
-// Repeat Preview
-export const REPEAT_PREVIEW_COUNT_OPTS = [
-  1, 2, 3, 4, 5,
-]
-export const REPEAT_PREVIEW_COUNT_SELECTED = {}
-REPEAT_PREVIEW_COUNT_SELECTED['Do Not Repeat'] = true
-REPEAT_PREVIEW_COUNT_OPTS.forEach(repeatOpt => {
-  REPEAT_PREVIEW_COUNT_SELECTED[repeatOpt] = false
-})
-
 // Starting Note Display
 export const SHEET_MUSIC_DISPLAY = 'Sheet Music'
 export const PIANO_DISPLAY = 'Piano Keyboard'
@@ -136,6 +130,7 @@ export const PLAY_MODES_SELECTED = {
 
 // All Notes
 export const NOTE_OPTS = Range.chromatic(['C2', 'C6'], { sharps: true })
+console.log(NOTE_OPTS.map(note => `'${note}'`).join(',\n'))
 export const FIXED_ROOT = {}
 export const LOWER_RANGE = {}
 export const UPPER_RANGE = {}

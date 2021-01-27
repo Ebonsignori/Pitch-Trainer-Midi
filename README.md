@@ -26,6 +26,10 @@ Below is a ss from the Interval game mode
 
 Production build is not tested.
 
+## Instruments
+
+A list of instruments used can be found [in this repo](https://github.com/Ebonsignori/pitch-trainer-instruments/tree/master/instruments). If you'd like to add an instrument it should be picked up by this app, feel free to open a PR 
+
 ## Work in Progress
 
 This was a two weekend MVP thrown together haphazardly and needs a lot of polish before it's done. Currently only intervals are supported, and option select is super laggy since everything is re-rendering on each input. The app is usable for Intervals, which is all I need atm.
@@ -33,11 +37,15 @@ This was a two weekend MVP thrown together haphazardly and needs a lot of polish
 Below is a list of TODO items before I'll consider this project "finished":
 
 - MIDI Support: input and game mode feedback
-- Fix slow option rendering
+- ~Fix slow option rendering~
 - Finish melodies game mode
 - Finish chords game mode
 - Fix bugs
 - Add note-name starting note display opt implementation
+- Add different instrument options
+- Add correct note played feedback
+- ~Persist settings~ 
+- Have sheet music use '8va' notation for high/low notes on clef
 
 Stretch-goal TODOs:
 
