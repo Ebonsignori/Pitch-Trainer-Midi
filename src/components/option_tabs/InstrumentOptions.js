@@ -9,6 +9,8 @@ import { getSelectedSetting } from '../../utils/settings'
 import { MICROPHONE_DEVICE } from '../../constants/settingsConstants'
 import { GreenBtn, RedBtn } from '../Buttons'
 import Microphone, { getInputDevices } from '../../utils/microphone'
+import { fetchInstruments } from '../../utils/instruments'
+import IntervalGame from '../../services/intervalGame'
 
 const GlobalSettingsWrapper = styled.div`
   border-top: 1px solid ${THEME_BORDER_COLOR};
@@ -67,39 +69,83 @@ const NotePreview = styled.div`
   margin-top: 2vh;
 `
 
+const { DEFAULT_INSTRUMENT, DEFAULT_MIC_INPUT } = process.env
+
 let microphone
-let devices
+let inputDevices
+let instruments
+let game
+let previousMic
+let previousInstrument
 function InputOptions () {
   const appState = useContext(AppContext)
   const [isListening, setIsListening] = useState(false)
   const [notePlayed, setNotePlayed] = useState(null)
-  const [devicesLoading, setDevicesLoading] = useState(false)
+  const [instrumentsLoading, setInstrumentsLoading] = useState(false)
+  const [instrumentReady, setInstrumentReady] = useState(false)
+  const [micDevicesLoading, setMicDevicesLoading] = useState(false)
   const [microphoneLoading, setMicrophoneLoading] = useState(false)
 
   const inputDeviceSelected = getSelectedSetting(appState.inputDeviceOpt)
-  const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true)
+  const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true) || DEFAULT_MIC_INPUT
+  const selectedInstrument = getSelectedSetting(appState.outputSoundsOpt, true) || DEFAULT_INSTRUMENT
 
   const refreshInputs = () => {
     microphone = null
-    devices = null
-    setDevicesLoading(true)
+    inputDevices = null
+    instruments = null
+    game = null
+    previousMic = null
+    previousInstrument = null
+    setInstrumentReady(false)
+    setMicDevicesLoading(true)
     setMicrophoneLoading(true)
+    setInstrumentsLoading(true)
+  }
+
+  if (!previousMic) {
+    previousMic = selectedMicDevice
+  }
+  if (!previousInstrument) {
+    previousInstrument = selectedInstrument
+  }
+  if (previousInstrument !== selectedInstrument) {
+    refreshInputs()
+  }
+  if (previousMic !== selectedMicDevice) {
+    refreshInputs()
   }
 
   // Async fetch and populate mic input device options
-  if (!devices) {
-    setDevicesLoading(true)
-    devices = getInputDevices().then((mics) => {
+  if (!inputDevices) {
+    setMicDevicesLoading(true)
+    inputDevices = getInputDevices().then((mics) => {
       const deviceOptions = {}
       mics.forEach(mic => {
-        if (mic.id === 'default') {
+        if (mic.id === selectedMicDevice) {
           deviceOptions[`${mic.label.replace('#', '')}#${mic.id}`] = true
         } else {
           deviceOptions[`${mic.label.replace('#', '')}#${mic.id}`] = false
         }
       })
       appState.setMicDeviceOpt(deviceOptions)
-      setDevicesLoading(false)
+      setMicDevicesLoading(false)
+    })
+  }
+
+  if (!instruments) {
+    setInstrumentsLoading(true)
+    instruments = fetchInstruments().then((instrumentMap) => {
+      const instrumentOptions = {}
+      Object.entries(instrumentMap).forEach(entry => {
+        if (entry[1] === selectedInstrument) {
+          instrumentOptions[`${entry[0]}#${entry[1]}`] = true
+        } else {
+          instrumentOptions[`${entry[0]}#${entry[1]}`] = false
+        }
+      })
+      appState.setOutputSoundsOpt(instrumentOptions)
+      setInstrumentsLoading(false)
     })
   }
 
@@ -108,8 +154,16 @@ function InputOptions () {
     setNotePlayed(note)
   }
 
+  if (instruments && selectedInstrument && !game) {
+    // TODO: Make generic parent class instead of interval game
+    game = new IntervalGame(appState)
+    game.instrumentReady().then(() => {
+      setInstrumentReady(true)
+    })
+  }
+
   // Once micDevice is selected, load microphone or on mic change
-  if ((devices && selectedMicDevice && !microphone) ||
+  if ((inputDevices && selectedMicDevice && !microphone) ||
     (microphone && microphone.deviceId !== selectedMicDevice)) {
     setMicrophoneLoading(true)
     microphone = new Microphone(
@@ -159,7 +213,7 @@ function InputOptions () {
   if (inputDeviceSelected === MICROPHONE_DEVICE) {
     DeviceOptions = (
       <>
-        {devicesLoading
+        {micDevicesLoading
           ? 'Loading mic devices...'
           : (
             <>
@@ -184,6 +238,27 @@ function InputOptions () {
           </ExplanationWrapper>
           <RadioForm title='Input Engine' stateValues={appState.inputDeviceOpt} setValues={appState.setInputDeviceOpt} />
           {DeviceOptions}
+          <ExplanationWrapper>
+            <ExplanatoryTitle>
+              Output Options
+            </ExplanatoryTitle>
+          </ExplanationWrapper>
+            {instrumentsLoading
+              ? 'Loading instruments...'
+              : (
+                <>
+                  <DropdownForm isCompound title='Instrument Sound' stateValues={appState.outputSoundsOpt} setValues={appState.setOutputSoundsOpt} />
+                  {instrumentReady
+                    ? <GreenBtn small onClick={() => game.playTestSong()} >Test Instrument</GreenBtn>
+                    : (
+                      <ExplanationWrapper>
+                        <ExplanatoryText>
+                          Loading Instrument. This may take a minute...
+                        </ExplanatoryText>
+                      </ExplanationWrapper>
+                      )}
+                </>
+                )}
         </GlobalSettingsWrapper>
   )
 }

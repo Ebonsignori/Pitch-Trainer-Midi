@@ -6,12 +6,14 @@ const { APP_NAME } = process.env
 const SETTINGS_DIRECTORY = path.join(homedir, APP_NAME)
 const SETTINGS_FILE = path.join(SETTINGS_DIRECTORY, 'settings.json')
 
+// NOTE: Make sure to add all new settings to this list
 const SETTINGS_KEYS = [
   'inputDeviceOpt',
   'midiDeviceOpt',
   'micDeviceOpt',
   'showMidiPianoOpt',
   'showPlayedMicNote',
+  'outputSoundsOpt',
   'tempoOpt',
   'repeatPreviewCountOpt',
   'startNoteDisplayOpt',

@@ -17,7 +17,7 @@ export default class IntervalGame {
     Tone.Transport.bpm.value = appState.tempoOpt || 80
     Tone.Transport.timeSignature = 4
 
-    this.instrument = getPiano()
+    this.instrumentOption = getSelectedSetting(appState.outputSoundsOpt, true)
 
     this.currentNoteIndex = 0
     this.lowestNote = getSelectedSetting(appState.lowerRangesOpt)
@@ -40,6 +40,13 @@ export default class IntervalGame {
     this.updateTotals = updateTotals
     this.notesPlayed = []
     this.shuffleNotes()
+  }
+
+  async getInstrument () {
+    if (!this._instrument) {
+      this._instrument = await getPiano(this.instrumentOption)
+    }
+    return this._instrument
   }
 
   shuffleNotes () {
@@ -194,9 +201,44 @@ export default class IntervalGame {
     return time
   }
 
-  async playNotes () {
+  async playTestSong () {
+    const instrument = await this.getInstrument()
     await Tone.loaded()
-    this.instrument.sync()
+    this.stopNotes()
+    instrument.sync()
+    const now = Tone.now()
+    let finalNoteTime = now + this.gain.toSeconds('4n')
+    const song = [
+      { time: now, note: 'C4', duration: '4n' },
+      { time: now + this.gain.toSeconds('4n'), note: 'E4', duration: '4n' },
+      { time: now + this.gain.toSeconds('4n') + this.gain.toSeconds('4n'), note: 'G4', duration: '4n' },
+      { time: now + this.gain.toSeconds('4n') + this.gain.toSeconds('4n') + this.gain.toSeconds('4n'), note: ['C4', 'E4', 'G4'], duration: '2n' },
+    ]
+    finalNoteTime += this.gain.toSeconds('4n') + this.gain.toSeconds('4n') + this.gain.toSeconds('4n')
+    for (const element of song) {
+      instrument.triggerAttackRelease(element.note, element.duration, element.time)
+    }
+
+    const donePlaying = new Promise((resolve, reject) => {
+      Tone.Transport.schedule((time) => {
+        this.stopNotes()
+        resolve(time)
+      }, finalNoteTime)
+    })
+    Tone.Transport.start(now, now)
+    return donePlaying
+  }
+
+  async instrumentReady () {
+    await this.getInstrument()
+    await Tone.loaded()
+    return true
+  }
+
+  async playNotes () {
+    const instrument = await this.getInstrument()
+    await Tone.loaded()
+    instrument.sync()
     const now = Tone.now()
     let finalNoteTime = now + this.gain.toSeconds('4n')
     let song = [
@@ -218,7 +260,7 @@ export default class IntervalGame {
       finalNoteTime = now + this.gain.toSeconds('2n')
     }
     for (const element of song) {
-      this.instrument.triggerAttackRelease(element.note, element.duration, element.time)
+      instrument.triggerAttackRelease(element.note, element.duration, element.time)
     }
 
     const donePlaying = new Promise((resolve, reject) => {

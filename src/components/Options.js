@@ -4,7 +4,7 @@ import { THEME_BORDER_COLOR, THEME_SPLASH_COLOR } from '../constants/styleConsta
 import { CHORDS, GLOBAL_OPTIONS, INPUT_OPTIONS, INTERVALS, MELODIES } from '../constants/gameConstants'
 import IntervalOptions from './option_tabs/IntervalOptions'
 import GlobalOptions from './option_tabs/GlobalOptions'
-import InputOptions from './option_tabs/InputOptions'
+import InstrumentOptions from './option_tabs/InstrumentOptions'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -76,7 +76,7 @@ function Options () {
   if (globalOptionsTab === GLOBAL_OPTIONS) {
     RenderedGlobalOptionsTab = <GlobalOptions />
   } else if (globalOptionsTab === INPUT_OPTIONS) {
-    RenderedGlobalOptionsTab = <InputOptions />
+    RenderedGlobalOptionsTab = <InstrumentOptions />
   } else {
     RenderedGlobalOptionsTab = `Internal Error. Invalid Tab, ${globalOptionsTab}`
   }

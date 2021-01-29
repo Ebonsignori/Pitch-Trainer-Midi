@@ -1,21 +1,36 @@
 import * as Tone from 'tone'
-import { NOTE_OPTS } from '../constants/settingsConstants'
 
-const urls = {}
-NOTE_OPTS.forEach(note => {
-  urls[note] = `${note.toLowerCase().replace('#', 's')}.mp3`
-})
+const { INSTRUMENTS_REPO_BASE_URL, DEFAULT_INSTRUMENT } = process.env
+
+async function fetchJson (url) {
+  try {
+    const res = await fetch(url)
+    return res.json()
+  } catch (err) {
+    console.error(`Unable to fetch and parse JSON from url: ${url}`)
+  }
+  return {}
+}
+
+export async function fetchInstruments () {
+  const infoJson = await fetchJson(`${INSTRUMENTS_REPO_BASE_URL}/instruments/info.json`)
+  return infoJson.instruments
+}
 
 let piano = null
 let prevPianoType = null
-export function getPiano (pianoType = 'SoftPiano') {
+export async function getPiano (pianoType = DEFAULT_INSTRUMENT) {
   if (piano && prevPianoType === pianoType) {
     return piano
   }
   prevPianoType = pianoType
+
+  const infoJson = await fetchJson(`${INSTRUMENTS_REPO_BASE_URL}/instruments/${pianoType}/info.json`)
+  console.log(infoJson)
   piano = new Tone.Sampler({
-    urls,
-    baseUrl: `https://raw.githubusercontent.com/Ebonsignori/piano-sounds/master/${pianoType}/`
+    urls: infoJson.fileMap,
+    baseUrl: `${INSTRUMENTS_REPO_BASE_URL}/instruments/${pianoType}/`
   }).toDestination()
+
   return piano
 }

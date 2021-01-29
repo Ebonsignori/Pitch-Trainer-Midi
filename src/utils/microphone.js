@@ -32,7 +32,7 @@ const nullFunc = () => {}
 
 export default class Microphone {
   constructor (deviceId, onNotePlayed, setIsListening) {
-    this.deviceId = deviceId
+    this.deviceId = deviceId || 'default'
     // Callback that is called when a note is played after listening
     this.onNotePlayed = onNotePlayed
     // Callbackt that is fired when listening has begun

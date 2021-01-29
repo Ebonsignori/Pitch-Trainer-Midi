@@ -15,6 +15,7 @@ import { GAME_OPTIONS, INTERVALS, RESULTS } from './constants/gameConstants'
 import Results from './components/Results'
 import { loadSettingsJson } from './utils/settings'
 
+// NOTE: Make sure to add all new settings to this list
 const existingSettings = loadSettingsJson()
 
 function App () {
@@ -24,15 +25,11 @@ function App () {
   // Input settings
   const [inputDeviceOpt, setInputDeviceOpt] = useState(existingSettings.inputDeviceOpt || INPUT_DEVICE_SELECTED)
   const [midiDeviceOpt, setMidiDeviceOpt] = useState(existingSettings.midiDeviceOpt || null)
-  const [micDeviceOpt, setMicDeviceOpt] = useState(existingSettings.micDeviceOpt || {
-    'default#default': true
-  })
+  const [micDeviceOpt, setMicDeviceOpt] = useState(existingSettings.micDeviceOpt || null)
   const [showMidiPianoOpt, setShowMidiPianoOpt] = useState(existingSettings.showMidiPianoOpt || true)
   const [showPlayedMicNote, setShowPlayedMicNote] = useState(existingSettings.showPlayedMicNote || true)
   // Output settings
-  const [outputSoundsOpt, setOutputSoundsOpt] = useState(existingSettings.outputSoundsOpt || {
-    'Steinway Grand Piano#steinway_grand_piano': true,
-  })
+  const [outputSoundsOpt, setOutputSoundsOpt] = useState(existingSettings.outputSoundsOpt || null)
 
   // Global game settings
   const [tempoOpt, setTempoOpt] = useState(existingSettings.tempoOpt || 80)
