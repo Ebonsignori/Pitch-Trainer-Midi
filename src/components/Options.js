@@ -1,10 +1,18 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { THEME_BORDER_COLOR, THEME_SPLASH_COLOR } from '../constants/styleConstants'
-import { CHORDS, GLOBAL_OPTIONS, INPUT_OPTIONS, INTERVALS, MELODIES } from '../constants/gameConstants'
+import {
+  CHORDS,
+  GLOBAL_OPTIONS,
+  INPUT_OPTIONS,
+  OUTPUT_OPTIONS,
+  INTERVALS,
+  MELODIES
+} from '../constants/gameConstants'
 import IntervalOptions from './option_tabs/IntervalOptions'
 import GlobalOptions from './option_tabs/GlobalOptions'
-import InstrumentOptions from './option_tabs/InstrumentOptions'
+import InputOptions from './option_tabs/InputOptions'
+import OutputOptions from './option_tabs/OutputOptions'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -43,7 +51,7 @@ const Tab = styled.span`
   font-size: 1.5vw; 
   align-items: center;
   justify-content: center;
-  min-width: 10vw;
+  min-width: 8vw;
   transition: .3s;
   ${props => props.selected && `background-color: ${THEME_SPLASH_COLOR};`}
 
@@ -76,7 +84,9 @@ function Options () {
   if (globalOptionsTab === GLOBAL_OPTIONS) {
     RenderedGlobalOptionsTab = <GlobalOptions />
   } else if (globalOptionsTab === INPUT_OPTIONS) {
-    RenderedGlobalOptionsTab = <InstrumentOptions />
+    RenderedGlobalOptionsTab = <InputOptions />
+  } else if (globalOptionsTab === OUTPUT_OPTIONS) {
+    RenderedGlobalOptionsTab = <OutputOptions />
   } else {
     RenderedGlobalOptionsTab = `Internal Error. Invalid Tab, ${globalOptionsTab}`
   }
@@ -95,6 +105,12 @@ function Options () {
             onClick={() => setGlobalOptionsTab(INPUT_OPTIONS)}
           >
             {INPUT_OPTIONS}
+          </Tab>
+          <Tab
+            selected={globalOptionsTab === OUTPUT_OPTIONS}
+            onClick={() => setGlobalOptionsTab(OUTPUT_OPTIONS)}
+          >
+            {OUTPUT_OPTIONS}
           </Tab>
         </TabsWrapper>
         {RenderedGlobalOptionsTab}

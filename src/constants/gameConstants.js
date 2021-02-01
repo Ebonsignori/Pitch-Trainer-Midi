@@ -8,6 +8,7 @@ export const RESULTS = 'Results'
 // Options pages
 export const GLOBAL_OPTIONS = 'Global'
 export const INPUT_OPTIONS = 'Input'
+export const OUTPUT_OPTIONS = 'Output'
 
 // Game states
 export const PLAYING_STATE = 'Playing...'

@@ -1,42 +1,39 @@
-const homedir = require('os').homedir()
-const path = require('path')
-const fs = require('fs')
-const player = require('node-wav-player')
+import * as Tone from 'tone'
+import { fetchJson } from './misc'
 
-const { APP_NAME } = process.env
-const SOUNDS_PATH = path.join(homedir, APP_NAME, 'sounds')
+const { INSTRUMENTS_REPO_BASE_URL, DEFAULT_SUCCESS_SOUND, DEFAULT_FAIL_SOUND } = process.env
 
-let notes
-const paths = {}
-export function getNotes () {
-  if (!notes) {
-    notes = {}
-    try {
-      fs.readdirSync(SOUNDS_PATH).forEach(noteFile => {
-        if (noteFile.includes('-1-48')) {
-          let noteName = noteFile.substr(0, 2)
-          if (noteFile.includes('#')) {
-            noteName = noteFile.substr(0, 3)
-          }
-          notes[noteName] = {
-            path: noteFile,
-            selected: false
-          }
-          paths[noteName] = noteFile
-        }
-      })
-    } catch (error) {
-      console.error(`Unable to read sounds directory at ${SOUNDS_PATH}`, error)
-      alert(`No instrument sounds in ${SOUNDS_PATH}. Please follow README to add sounds to this path.`)
-      window.close()
-    }
-  }
-  return notes
+export async function fetchSounds () {
+  const infoJson = await fetchJson(`${INSTRUMENTS_REPO_BASE_URL}/effects/info.json`)
+  return infoJson.sounds
 }
 
-export async function playNote (noteName) {
-  const notePath = paths[noteName]
-  return player.play({
-    path: path.join(SOUNDS_PATH, notePath)
+let successPlayer = null
+let prevSuccessFile = null
+export async function getSuccessPlayer (successFile = DEFAULT_SUCCESS_SOUND) {
+  if (successPlayer && prevSuccessFile === successFile) {
+    return successPlayer
+  }
+  prevSuccessFile = successFile
+
+  return new Promise(resolve => {
+    successPlayer = new Tone.Player(`${INSTRUMENTS_REPO_BASE_URL}/effects/${successFile}`, () => {
+      resolve(successPlayer)
+    }).toDestination()
+  })
+}
+
+let failPlayer = null
+let prevFailFile = null
+export async function getFailPlayer (failFile = DEFAULT_FAIL_SOUND) {
+  if (successPlayer && prevFailFile === failFile) {
+    return successPlayer
+  }
+  prevFailFile = failFile
+
+  return new Promise(resolve => {
+    failPlayer = new Tone.Player(`${INSTRUMENTS_REPO_BASE_URL}/effects/${failFile}`, () => {
+      resolve(failPlayer)
+    }).toDestination()
   })
 }

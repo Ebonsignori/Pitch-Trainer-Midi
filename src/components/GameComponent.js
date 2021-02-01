@@ -4,14 +4,15 @@ import { Piano } from 'react-piano'
 import { PianoStyle } from './note_display/pianoStyle'
 import AppContext from '../AppContext'
 import { ANSWERED_STATE, INTERVALS, LISTENING_STATE, PLAYING_STATE, RESULTS } from '../constants/gameConstants'
-import { ASCENDING, INFINITE, MICROPHONE_DEVICE, PIANO_DISPLAY, SHEET_MUSIC_DISPLAY } from '../constants/settingsConstants'
+import { INFINITE, MICROPHONE_DEVICE, NOTE_DISPLAY, PIANO_DISPLAY, SHEET_MUSIC_DISPLAY } from '../constants/settingsConstants'
 import { THEME_SPLASH_COLOR } from '../constants/styleConstants'
-import IntervalGame from '../services/intervalGame'
+import IntervalGame from '../services/IntervalGame'
 import { GreenBtn, RedBtn, ThemeBtn } from './Buttons'
-import SheetMusic from './note_display/SheetMusic'
+// import SheetMusic from './note_display/SheetMusic'
 import { Note } from '@tonaljs/tonal'
 import Microphone from '../utils/microphone'
 import { getSelectedSetting } from '../utils/settings'
+import NoteStrings from './note_display/NoteStrings'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -88,7 +89,7 @@ const StateRow = styled.div`
 
 const Playing = styled.div`
   font-size: 2.5vw;
-font-weight: 600;
+  font-weight: 600;
   color: orange;
 `
 
@@ -111,8 +112,7 @@ const AnswerResult = styled.div`
 
 const IntervalResult = styled.div`
   font-size: 2.5vw;
-  font-weight: 600;
-  color: ${THEME_SPLASH_COLOR};
+  font-weight: 900;
 `
 
 const InfoRow = styled.div`
@@ -144,6 +144,23 @@ const PianoRow = styled.div`
   min-height: 15vh;
 `
 
+const NotePlayedWrapper = styled.div`
+  margin-top: 3vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`
+
+const NotePlayedTitle = styled.div`
+  font-size: 2vw;
+`
+
+const NotePlayedText = styled.div`
+  font-size: 2.5vw;
+  font-weight: 900;
+`
+
 const CORRECT = 'Correct!'
 const WRONG = 'Incorrect.'
 let gameObject
@@ -169,7 +186,8 @@ function Game () {
   const appState = useContext(AppContext)
   const [gameState, setGameState] = useState(PLAYING_STATE)
   const [gameIsLoading, setGameIsLoading] = useState(true)
-  const [rootNote, setRootNote] = useState('C3')
+  const [noteDisplayIsLoading, setNoteDisplayIsLoading] = useState(true)
+  const [notePlayed, setNotePlayed] = useState(null)
   const [answerResult, setAnswerResult] = useState(CORRECT)
   const [numberCorrect, setNumberCorrect] = useState(0)
   const [numberWrong, setNumberWrong] = useState(0)
@@ -198,6 +216,7 @@ function Game () {
     }
     setGameState(ANSWERED_STATE)
     if (isWrong) {
+      gameObject.playFailSound()
       setAnswerResult(WRONG)
       setNumberWrong((prevWrong) => prevWrong + 1)
       if (appState.repeatOnWrongOpt) {
@@ -242,9 +261,10 @@ function Game () {
       gameObject = new IntervalGame(
         appState,
         setGameState,
-        setRootNote,
         updateTotals,
-        setRepeating
+        setRepeating,
+        setNoteDisplayIsLoading,
+        setNotePlayed
       )
     }
   }
@@ -278,7 +298,8 @@ function Game () {
     const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true)
     microphone = new Microphone(
       selectedMicDevice,
-      (note) => gameObject.onNotePlayed(note, true)
+      (note) => gameObject.onNotePlayed(note, true),
+      appState.setErrorModalData
     )
     microphone.init().then(() => {
       microphone.listen()
@@ -292,16 +313,16 @@ function Game () {
     return 'Loading...'
   }
 
-  let MidiPianoDisplay = null
+  let NotePlayedDisplay = null
   if (!isUsingMic && appState.showMidiPianoOpt) {
     const firstNote = Note.get(gameObject.lowestNote || 'C2').midi
     const lastNote = Note.get(gameObject.highestNote || 'C6').midi
-    MidiPianoDisplay = (
+    NotePlayedDisplay = (
       <PianoRow>
         <PianoStyle />
         <Piano
           noteRange={{ first: firstNote, last: lastNote }}
-          activeNotes={[Note.get(gameObject.playMode === ASCENDING ? rootNote : gameObject.secondNote).midi]}
+          activeNotes={[Note.get(gameObject.songNotes[0]).midi]}
           playNote={(midiNumber) => {
             // Play a given note - see notes below
           }}
@@ -312,32 +333,63 @@ function Game () {
         />
       </PianoRow>
     )
+  } else if (isUsingMic && notePlayed && gameState !== ANSWERED_STATE) {
+    NotePlayedDisplay = (
+      <NotePlayedWrapper>
+        <NotePlayedTitle>
+          Last Note Played:
+        </NotePlayedTitle>
+        <NotePlayedText>
+         {notePlayed}
+        </NotePlayedText>
+      </NotePlayedWrapper>
+    )
   }
 
   let NoteDisplay = null
-  if (noteDisplayOpt === PIANO_DISPLAY) {
-    const firstNote = Note.get(gameObject.lowestNote || 'C2').midi
-    const lastNote = Note.get(gameObject.highestNote || 'C6').midi
-    NoteDisplay = (
+  if (!noteDisplayIsLoading) {
+    if (noteDisplayOpt === PIANO_DISPLAY) {
+      const firstNote = Note.get(gameObject.lowestNote || 'C2').midi
+      const lastNote = Note.get(gameObject.highestNote || 'C6').midi
+      const activeNotes = []
+      if (gameObject && gameObject.songNotes && gameObject.songNotes.length) {
+        for (let i = 0; i < gameObject.songNotes.length; i++) {
+          if (i < gameObject.correctIndex || i === 0) {
+            activeNotes.push(Note.get(gameObject.songNotes[i]).midi)
+          }
+        }
+      }
+      NoteDisplay = (
       <PianoRow>
         <PianoStyle />
         <Piano
           noteRange={{ first: firstNote, last: lastNote }}
-          activeNotes={[Note.get(gameObject.playMode === ASCENDING ? rootNote : gameObject.secondNote).midi]}
+          activeNotes={activeNotes}
           playNote={() => {}}
           stopNote={() => {}}
           width={500}
         />
       </PianoRow>
-    )
-  } else if (noteDisplayOpt === SHEET_MUSIC_DISPLAY) {
-    NoteDisplay = (
-      <SheetMusic
-        notes={[rootNote, gameObject.secondNote]}
-        playMode={gameObject.playMode}
-        key={rootNote}
-      />
-    )
+      )
+    } else if (noteDisplayOpt === SHEET_MUSIC_DISPLAY) {
+    // NoteDisplay = (
+    // <SheetMusic
+    // // notes={gameObject.songNotes}
+    // notes={[['c4', 'e4'], 'd4']}
+    // correctIndex={gameObject.correctIndex}
+    // playMode={gameObject.playMode}
+    // key={gameObject.songNotes.join('-')}
+    // />
+    // )
+    } else if (noteDisplayOpt === NOTE_DISPLAY) {
+      NoteDisplay = (
+        <NoteStrings
+          notes={gameObject.songNotes}
+          correctIndex={gameObject.correctIndex}
+          correctHarmonics={gameObject.correctHarmonics}
+        />
+      )
+    }
   }
 
   let StatusDisplay = <Listening>{gameState}</Listening>
@@ -398,9 +450,19 @@ function Game () {
         {NextBtnDisplay}
       </ButtonsRow>
       <ButtonsRow>
-        <RedBtn onClick={() => setGameState(RESULTS)}>End</RedBtn>
+        <RedBtn onClick={() => {
+          appState.setPromptModalData({
+            onModalPrompt: (shouldDoPrompt) => {
+              if (shouldDoPrompt) {
+                setGameState(RESULTS)
+              }
+              appState.setPromptModalData({})
+            },
+            heading: 'Are you sure you want to stop playing?'
+          })
+        }}>End</RedBtn>
       </ButtonsRow>
-      {MidiPianoDisplay}
+      {NotePlayedDisplay}
     </PageWrapper>
   )
 }

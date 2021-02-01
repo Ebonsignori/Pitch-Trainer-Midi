@@ -19,8 +19,7 @@ class SheetMusic extends Component {
     this.divRef = React.createRef()
   }
 
-  processNotes () {
-    let notes = [...this.props.notes]
+  getClefAndPlaceholder (notes) {
     let clef = 'treble'
     let notePlaceholder = 'B4'
     let clefCenter = notes[0]
@@ -33,22 +32,70 @@ class SheetMusic extends Component {
       notePlaceholder = 'D3'
       clef = 'bass'
     }
-    const voices = []
-    if (this.props.playMode === DESCENDING) {
-      notes = notes.reverse()
+    return [clef, notePlaceholder]
+  }
+
+  getClef (note) {
+    let clef = 'treble'
+    const octave = Note.octave(note)
+    if (octave <= 4) {
+      clef = 'bass'
     }
-    for (const note of notes) {
-      const voice = []
-      if (this.props.playMode === ASCENDING || this.props.playMode === DESCENDING) {
-        voice.push(`${note}/q`)
-        voice.push(`${notePlaceholder}/q/r`)
-        voice.push(`${notePlaceholder}/h/r`)
-      } else if (this.props.playMode === HARMONIC) {
-        voice.pop()
-        voice.push(`${note}/w`)
+    return clef
+  }
+
+  fillInRemainderWithRests (voice) {
+    let totalTime = 0
+    for (const item of voice) {
+      if (item.includes('/q')) {
+        totalTime += 1
+      } else if (item.includes('/h')) {
+        totalTime += 2
       }
-      voices.push(voice)
     }
+    for (let time = totalTime; time < 4; time++) {
+      voice.push(`${}/q/r`)
+    }
+  }
+
+  // moveToClefs (voices) {
+    // const clefs = {
+      // bass: []
+      // treble: []
+    // }
+    // for (const voice of voices) {
+      // for (const note of voice) {
+
+      // }
+    // }
+  // }
+
+  processNotes () {
+    const notes = [...this.props.notes]
+    const correctIndex = this.props.correctIndex
+    // 4 voices for 4 possible simultaneous notes at one time 
+    const voices = [
+      [],
+      [],
+      [],
+      []
+    ]
+    let clef
+    let notePlaceholder
+    for (const note of notes) {
+      // When chord / harmonic multiple notes at once
+      if (Array.isArray(note)) {
+        note.forEach((notePart, index) => {
+          voices[index].push(`${notePart}/h`)
+        })
+      // When single note
+      } else {
+        voices[0].push(`${note}/q`)
+      }
+    }
+    // const cleffedVoices = this.moveToClefs(voices)
+    voices.forEach((voice) => this.fillInRemainderWithRests(voice))
+    console.log(voices)
     return [clef, voices]
   }
 

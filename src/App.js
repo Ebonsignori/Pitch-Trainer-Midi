@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Game from './components/Game'
+import GameComponent from './components/GameComponent'
 import Options from './components/Options'
 import AppContext from './AppContext'
 import {
@@ -14,6 +14,8 @@ import {
 import { GAME_OPTIONS, INTERVALS, RESULTS } from './constants/gameConstants'
 import Results from './components/Results'
 import { loadSettingsJson } from './utils/settings'
+import PromptModal from './components/modal/promptModal'
+import ErrorModule from './components/modal/errorModal'
 
 // NOTE: Make sure to add all new settings to this list
 const existingSettings = loadSettingsJson()
@@ -21,6 +23,10 @@ const existingSettings = loadSettingsJson()
 function App () {
   const [selectedGameMode, setSelectedGameMode] = useState(GAME_OPTIONS)
   // const [selectedGameMode, setSelectedGameMode] = useState(INTERVALS)
+
+  // Modal State
+  const [promptModalData, setPromptModalData] = useState({})
+  const [errorModalData, setErrorModalData] = useState({})
 
   // Input settings
   const [inputDeviceOpt, setInputDeviceOpt] = useState(existingSettings.inputDeviceOpt || INPUT_DEVICE_SELECTED)
@@ -30,6 +36,10 @@ function App () {
   const [showPlayedMicNote, setShowPlayedMicNote] = useState(existingSettings.showPlayedMicNote || true)
   // Output settings
   const [outputSoundsOpt, setOutputSoundsOpt] = useState(existingSettings.outputSoundsOpt || null)
+  const [playSuccessSoundOpt, setPlaySuccessSoundOpt] = useState(existingSettings.playSuccessSoundOpt || true)
+  const [successSoundsOpt, setSuccessSoundsOpt] = useState(existingSettings.successSoundsOpt || null)
+  const [playFailSoundOpt, setPlayFailSoundOpt] = useState(existingSettings.playFailSoundOpt || true)
+  const [failSoundsOpt, setFailSoundsOpt] = useState(existingSettings.failSoundsOpt || null)
 
   // Global game settings
   const [tempoOpt, setTempoOpt] = useState(existingSettings.tempoOpt || 80)
@@ -53,8 +63,13 @@ function App () {
   const [gameStats, setGameStats] = useState({})
 
   const appState = {
+    // Internal State
     selectedGameMode,
     setSelectedGameMode,
+    // Modal State
+    setPromptModalData,
+    setErrorModalData,
+    // Input Options
     inputDeviceOpt,
     setInputDeviceOpt,
     midiDeviceOpt,
@@ -65,8 +80,18 @@ function App () {
     setShowMidiPianoOpt,
     showPlayedMicNote,
     setShowPlayedMicNote,
+    // Output options
     outputSoundsOpt,
     setOutputSoundsOpt,
+    playSuccessSoundOpt,
+    setPlaySuccessSoundOpt,
+    successSoundsOpt,
+    setSuccessSoundsOpt,
+    playFailSoundOpt,
+    setPlayFailSoundOpt,
+    failSoundsOpt,
+    setFailSoundsOpt,
+    // Global Game options
     tempoOpt,
     setTempoOpt,
     repeatPreviewCountOpt,
@@ -101,7 +126,7 @@ function App () {
 
   let MainRender = <Options />
   if (selectedGameMode === INTERVALS) {
-    MainRender = <Game />
+    MainRender = <GameComponent />
   } else if (selectedGameMode === RESULTS) {
     MainRender = <Results
       gameStats={gameStats}
@@ -114,6 +139,16 @@ function App () {
   return (
       <AppContext.Provider value={appState}>
         {MainRender}
+        <PromptModal
+          modalOpen={!!promptModalData.onModalPrompt}
+          closeModal={() => setPromptModalData({})}
+          modalData={promptModalData}
+        />
+        <ErrorModule
+          modalOpen={!!errorModalData.onModalPrompt}
+          closeModal={() => errorModalData({})}
+          modalData={errorModalData}
+        />
       </AppContext.Provider>
   )
 }

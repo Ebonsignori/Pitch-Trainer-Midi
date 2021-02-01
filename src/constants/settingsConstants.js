@@ -38,9 +38,9 @@ export const STARTING_NOTE_DISPLAY_OPTS = [
 ]
 
 export const START_NOTE_DISPLAY_SELECTED = {
-  [SHEET_MUSIC_DISPLAY]: true,
+  // [SHEET_MUSIC_DISPLAY]: true,
+  [NOTE_DISPLAY]: true,
   [PIANO_DISPLAY]: false,
-  [NOTE_DISPLAY]: false,
   [NONE_DISPLAY]: false,
 }
 
@@ -130,7 +130,6 @@ export const PLAY_MODES_SELECTED = {
 
 // All Notes
 export const NOTE_OPTS = Range.chromatic(['C2', 'C6'], { sharps: true })
-console.log(NOTE_OPTS.map(note => `'${note}'`).join(',\n'))
 export const FIXED_ROOT = {}
 export const LOWER_RANGE = {}
 export const UPPER_RANGE = {}

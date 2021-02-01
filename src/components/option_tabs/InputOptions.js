@@ -9,8 +9,6 @@ import { getSelectedSetting } from '../../utils/settings'
 import { MICROPHONE_DEVICE } from '../../constants/settingsConstants'
 import { GreenBtn, RedBtn } from '../Buttons'
 import Microphone, { getInputDevices } from '../../utils/microphone'
-import { fetchInstruments } from '../../utils/instruments'
-import IntervalGame from '../../services/intervalGame'
 
 const GlobalSettingsWrapper = styled.div`
   border-top: 1px solid ${THEME_BORDER_COLOR};
@@ -69,48 +67,31 @@ const NotePreview = styled.div`
   margin-top: 2vh;
 `
 
-const { DEFAULT_INSTRUMENT, DEFAULT_MIC_INPUT } = process.env
+const { DEFAULT_MIC_INPUT } = process.env
 
 let microphone
 let inputDevices
-let instruments
-let game
 let previousMic
-let previousInstrument
 function InputOptions () {
   const appState = useContext(AppContext)
   const [isListening, setIsListening] = useState(false)
-  const [notePlayed, setNotePlayed] = useState(null)
-  const [instrumentsLoading, setInstrumentsLoading] = useState(false)
-  const [instrumentReady, setInstrumentReady] = useState(false)
+  const [notesPlayed, setNotesPlayed] = useState(null)
   const [micDevicesLoading, setMicDevicesLoading] = useState(false)
   const [microphoneLoading, setMicrophoneLoading] = useState(false)
 
   const inputDeviceSelected = getSelectedSetting(appState.inputDeviceOpt)
   const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true) || DEFAULT_MIC_INPUT
-  const selectedInstrument = getSelectedSetting(appState.outputSoundsOpt, true) || DEFAULT_INSTRUMENT
 
   const refreshInputs = () => {
     microphone = null
     inputDevices = null
-    instruments = null
-    game = null
     previousMic = null
-    previousInstrument = null
-    setInstrumentReady(false)
     setMicDevicesLoading(true)
     setMicrophoneLoading(true)
-    setInstrumentsLoading(true)
   }
 
   if (!previousMic) {
     previousMic = selectedMicDevice
-  }
-  if (!previousInstrument) {
-    previousInstrument = selectedInstrument
-  }
-  if (previousInstrument !== selectedInstrument) {
-    refreshInputs()
   }
   if (previousMic !== selectedMicDevice) {
     refreshInputs()
@@ -133,33 +114,9 @@ function InputOptions () {
     })
   }
 
-  if (!instruments) {
-    setInstrumentsLoading(true)
-    instruments = fetchInstruments().then((instrumentMap) => {
-      const instrumentOptions = {}
-      Object.entries(instrumentMap).forEach(entry => {
-        if (entry[1] === selectedInstrument) {
-          instrumentOptions[`${entry[0]}#${entry[1]}`] = true
-        } else {
-          instrumentOptions[`${entry[0]}#${entry[1]}`] = false
-        }
-      })
-      appState.setOutputSoundsOpt(instrumentOptions)
-      setInstrumentsLoading(false)
-    })
-  }
-
   // Callback used internally by Microphone to set played note
   const onNotePlayed = (note) => {
-    setNotePlayed(note)
-  }
-
-  if (instruments && selectedInstrument && !game) {
-    // TODO: Make generic parent class instead of interval game
-    game = new IntervalGame(appState)
-    game.instrumentReady().then(() => {
-      setInstrumentReady(true)
-    })
+    setNotesPlayed(note)
   }
 
   // Once micDevice is selected, load microphone or on mic change
@@ -169,6 +126,7 @@ function InputOptions () {
     microphone = new Microphone(
       selectedMicDevice,
       onNotePlayed,
+      appState.setErrorModalData,
       setIsListening
     )
     microphone.init().then(() => {
@@ -184,8 +142,8 @@ function InputOptions () {
       let NotePreviewRender = null
       if (isListening) {
         NotePreviewRender = 'Listening...'
-        if (notePlayed) {
-          NotePreviewRender = notePlayed
+        if (notesPlayed && notesPlayed.length) {
+          NotePreviewRender = notesPlayed[0]
         }
       } else {
         NotePreviewRender = 'Not Listening'
@@ -223,6 +181,7 @@ function InputOptions () {
             )
         }
         {MicPreviewRender}
+        <ToggleForm title='Show Picked Up Note in Game' stateValue={appState.showMidiPianoOpt} setValue={appState.setShowMidiPianoOpt} />
       </>
     )
   }
@@ -230,35 +189,14 @@ function InputOptions () {
         <GlobalSettingsWrapper>
           <ExplanationWrapper>
             <ExplanatoryTitle>
-              Instrument Options
+              Input Options
             </ExplanatoryTitle>
             <ExplanatoryText>
-              Input and playback instrument options.
+              Input method and device.
             </ExplanatoryText>
           </ExplanationWrapper>
           <RadioForm title='Input Engine' stateValues={appState.inputDeviceOpt} setValues={appState.setInputDeviceOpt} />
           {DeviceOptions}
-          <ExplanationWrapper>
-            <ExplanatoryTitle>
-              Output Options
-            </ExplanatoryTitle>
-          </ExplanationWrapper>
-            {instrumentsLoading
-              ? 'Loading instruments...'
-              : (
-                <>
-                  <DropdownForm isCompound title='Instrument Sound' stateValues={appState.outputSoundsOpt} setValues={appState.setOutputSoundsOpt} />
-                  {instrumentReady
-                    ? <GreenBtn small onClick={() => game.playTestSong()} >Test Instrument</GreenBtn>
-                    : (
-                      <ExplanationWrapper>
-                        <ExplanatoryText>
-                          Loading Instrument. This may take a minute...
-                        </ExplanatoryText>
-                      </ExplanationWrapper>
-                      )}
-                </>
-                )}
         </GlobalSettingsWrapper>
   )
 }

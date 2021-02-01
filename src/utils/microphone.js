@@ -31,12 +31,13 @@ export async function getSourceStream (deviceId) {
 const nullFunc = () => {}
 
 export default class Microphone {
-  constructor (deviceId, onNotePlayed, setIsListening) {
+  constructor (deviceId, onNotePlayed, setErrorModalData, setIsListening) {
     this.deviceId = deviceId || 'default'
     // Callback that is called when a note is played after listening
     this.onNotePlayed = onNotePlayed
     // Callbackt that is fired when listening has begun
     this.setIsListening = setIsListening || nullFunc
+    this.setErrorModalData = setErrorModalData
     this.listening = null
     this.refreshHandle = null
     this.audioProcessor = null
@@ -56,7 +57,13 @@ export default class Microphone {
     try {
       this.sourceStream = await getSourceStream('default')
     } catch (error) {
-      // TODO: Error module and close
+      console.error(error)
+      this.setErrorModalData({
+        heading: 'Something is wrong with mic input device. Please restart and choose another.',
+        onModalPrompt: () => {
+          process.exit(1)
+        }
+      })
       return
     }
     this._init = true
@@ -91,23 +98,21 @@ export default class Microphone {
     this.mediaRecorder.ondataavailable = this.update.bind(this)
     this.mediaRecorder.start()
     this.setIsListening(true)
-    setTimeout(() => this.listening && this.mediaRecorder.stop(), 500)
+    setTimeout(() => this.listening && this.mediaRecorder.stop(), 200)
 
-    // Every 500ms, send whatever has been recorded to the audio processor.
-    // This can't be done with `mediaRecorder.start(ms)` because the
-    // `AudioContext` may fail to decode the audio data when sent in parts.
+    // Every 200ms, send whatever has been recorded to the audio processor.
     this.refreshHandle = setInterval(() => {
       this.listening && this.mediaRecorder.start()
-      setTimeout(() => this.listening && this.mediaRecorder.stop(), 500)
-    }, 1000)
+      setTimeout(() => this.listening && this.mediaRecorder.stop(), 200)
+    }, 250)
   }
 
   // Handles responses received from the audio processing web worker.
   handleProcessorMessage (e) {
     if (this.listening) {
       if (e.data) {
-        const playedNote = e.data.key + e.data.octave.toString()
-        this.onNotePlayed(playedNote)
+        // Send notes to callback
+        this.onNotePlayed(e.data)
       }
     }
   }
@@ -126,10 +131,8 @@ export default class Microphone {
       }
       // Send the audio data to the audio processing worker.
       this.audioProcessor.postMessage({
-        a4: undefined,
         sampleRate: audioBuffer.sampleRate,
         audioData,
-        accidentals: 'sharps'
       })
     }
   }
