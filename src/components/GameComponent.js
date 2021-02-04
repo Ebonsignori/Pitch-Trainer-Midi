@@ -168,20 +168,22 @@ let microphone
 let isUsingMic = null
 let noteDisplayOpt = null
 let countDownInterval = null
-let initialNotePlayed = false
 
 function Game () {
   useEffect(() => {
   // On umount, cleanup
     return () => {
-      microphone.stop()
-      gameObject = undefined
+      if (microphone) {
+        microphone.stop()
+      }
       microphone = undefined
+      gameObject = undefined
       isUsingMic = null
       noteDisplayOpt = null
-      clearInterval(countDownInterval)
+      if (countDownInterval) {
+        clearInterval(countDownInterval)
+      }
       countDownInterval = null
-      initialNotePlayed = false
     }
   }, [])
 
@@ -275,6 +277,7 @@ function Game () {
       )
       gameObject.instrumentReady().then(() => {
         setGameObjectLoading(false)
+        gameObject.onNext()
       })
     }
   }
@@ -313,11 +316,6 @@ function Game () {
 
   if ((isUsingMic && microphoneLoading) || gameObjectLoading) {
     return 'Loading...'
-  }
-
-  if (!initialNotePlayed) {
-    initialNotePlayed = true
-    gameObject.onNext()
   }
 
   let NotePlayedDisplay = null

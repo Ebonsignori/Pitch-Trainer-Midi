@@ -164,6 +164,10 @@ class Game {
     if (currentState !== LISTENING_STATE) {
       return
     }
+    // Use certain notes out of range as repeat commands
+    if (notes[0] === 'B0') {
+      return this.onReplay()
+    }
     const correctNote = this.songNotes[this.correctIndex]
     // When playing via a mic, we don't penalize for wrong notes since the mic is inacurate
     if (isMic && notes.length) {

@@ -10,9 +10,10 @@ onmessage = e => {
 }
 
 console.log('worker started')
+// const AMDFAlgo = Pitchfinder.AMDF({ minFrequency: 46, maxFrequency: 2150 })
 function analyseAudioData ({ sampleRate, audioData }) {
-  const detectPitch = Pitchfinder.YIN({ sampleRate })
-  const frequencies = Pitchfinder.frequencies(detectPitch, audioData)
+  const YINAlgo = Pitchfinder.YIN({ sampleRate })
+  const frequencies = Pitchfinder.frequencies(YINAlgo, audioData)
   if (frequencies === null) {
     return null
   }

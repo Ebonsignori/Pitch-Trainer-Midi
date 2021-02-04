@@ -17,6 +17,7 @@ export async function getPiano (pianoType = DEFAULT_INSTRUMENT) {
   prevPianoType = pianoType
 
   const infoJson = await fetchJson(`${INSTRUMENTS_REPO_BASE_URL}/instruments/${pianoType}/info.json`)
+  // TODO: fix different sampling octave names
   piano = new Tone.Sampler({
     urls: infoJson.fileMap,
     baseUrl: `${INSTRUMENTS_REPO_BASE_URL}/instruments/${pianoType}/`

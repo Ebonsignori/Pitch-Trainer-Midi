@@ -26,8 +26,8 @@ export async function getSuccessPlayer (successFile = DEFAULT_SUCCESS_SOUND) {
 let failPlayer = null
 let prevFailFile = null
 export async function getFailPlayer (failFile = DEFAULT_FAIL_SOUND) {
-  if (successPlayer && prevFailFile === failFile) {
-    return successPlayer
+  if (failPlayer && prevFailFile === failFile) {
+    return failPlayer
   }
   prevFailFile = failFile
 
