@@ -75,7 +75,7 @@ function IntervalOptions () {
       </SelectedTabRow>
       <SelectedTabRow>
         <SelectedTabColumn>
-            <NumberForm title='Number of Questions' units='-1 for infinite' stateValue={appState.numberOfQuestionsOpt} setValue={appState.setNumberOfQuestionsOpt} canBeInfinite />
+            <NumberForm title='Number of Questions' units='Empty for infinite' stateValue={appState.numberOfQuestionsOpt} setValue={appState.setNumberOfQuestionsOpt} canBeInfinite />
         </SelectedTabColumn>
         <SelectedTabColumn>
           <CheckboxForm title='Intervals' stateValues={appState.intervalsOpt} setValues={appState.setIntervalsOpt} />

@@ -52,19 +52,19 @@ export default class Microphone {
     try {
       this.sourceStream = await getSourceStream(this.deviceId)
     } catch (error) {
-      console.error(error)
-    }
-    try {
-      this.sourceStream = await getSourceStream('default')
-    } catch (error) {
-      console.error(error)
-      this.setErrorModalData({
-        heading: 'Something is wrong with mic input device. Please restart and choose another.',
-        onModalPrompt: () => {
-          process.exit(1)
-        }
-      })
-      return
+      try {
+        this.sourceStream = await getSourceStream('default')
+      } catch (error) {
+        console.error(error)
+        console.log('DeviceID:', this.deviceId)
+        this.setErrorModalData({
+          heading: 'Something is wrong with mic input device. Please restart and choose another.',
+          onModalPrompt: () => {
+            process.exit(1)
+          }
+        })
+        return
+      }
     }
     this._init = true
     return true
@@ -73,7 +73,12 @@ export default class Microphone {
   stop () {
     this.listening = false
     clearInterval(this.refreshHandle)
-    this.audioProcessor.terminate()
+    try {
+      this.audioProcessor.terminate()
+    } catch (err) {
+      console.log('audioProcessor error on stop')
+      console.error(err)
+    }
     this.audioProcessor = null
     try {
       this.mediaRecorder.stop()
@@ -86,7 +91,7 @@ export default class Microphone {
 
   listen (deviceId) {
     console.log('Listening on mic input device...')
-    if (!this.init) {
+    if (!this._init) {
       console.error('Microphone class has not been initialized. Must call await init() first')
       return
     }
@@ -98,13 +103,13 @@ export default class Microphone {
     this.mediaRecorder.ondataavailable = this.update.bind(this)
     this.mediaRecorder.start()
     this.setIsListening(true)
-    setTimeout(() => this.listening && this.mediaRecorder.stop(), 200)
+    setTimeout(() => this.listening && this.mediaRecorder.stop(), 400)
 
     // Every 200ms, send whatever has been recorded to the audio processor.
     this.refreshHandle = setInterval(() => {
       this.listening && this.mediaRecorder.start()
-      setTimeout(() => this.listening && this.mediaRecorder.stop(), 200)
-    }, 250)
+      setTimeout(() => this.listening && this.mediaRecorder.stop(), 400)
+    }, 500)
   }
 
   // Handles responses received from the audio processing web worker.

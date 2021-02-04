@@ -11,8 +11,12 @@ const Button = styled(styledBtn)`
   margin: 1vw;
 
   :hover {
-    cursor: pointer;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   }
+
+  ${props => props.disabled && `
+    background-color: grey !important;
+  `}
 `
 
 export const GreenBtn = styled(Button)`

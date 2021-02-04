@@ -4,13 +4,13 @@ A highly configurable electron app for relative pitch (ear) training.
 
 Runs through a series of randomized interval, chord, or randomly generated melodies and prompts for matching playback from a MIDI (piano keyboard) or microphone input device.
 
-For intervals, frequency detection via a microphone can be used, but for chords and melodies game types, MIDI is preferred.
+For intervals, frequency detection via a microphone can be used, but for any setting where chords (harmonic) is enabled, MIDI is preferred. Chords must be played out one note at a time (arpeggiated) to be picked up by microphone / frequency detection.
 
 **Note:** Currently only microphone input feedback for Interval mode is supported.
 
 ## Demo
 
-There are three different customizable game modes
+There are three customizable game modes
 
 ![Options Demo](./docs/options_demo.png)
 
@@ -32,7 +32,8 @@ A list of instruments used can be found [in this repo](https://github.com/Ebonsi
 
 ## Work in Progress
 
-This was a two weekend MVP thrown together haphazardly and needs a lot of polish before it's done. Currently only intervals are supported, and option select is super laggy since everything is re-rendering on each input. The app is usable for Intervals, which is all I need atm.
+Currently only microphone (frequency) feedback works for Interval mode.
+
 
 Below is a list of TODO items before I'll consider this project "finished":
 
@@ -41,11 +42,11 @@ Below is a list of TODO items before I'll consider this project "finished":
 - Finish melodies game mode
 - Finish chords game mode
 - Fix bugs
-- Add note-name starting note display opt implementation
-- Add different instrument options
-- Add correct note played feedback
+- ~Add note-name starting note display opt implementation~
+- ~Add different instrument options~
+- ~Add correct note played feedback~
 - ~Persist settings~ 
-- Have sheet music use '8va' notation for high/low notes on clef
+- ~Have sheet music use '8va' notation for high/low notes on clef~ Removed sheet music disp in favor of other note disp opts
 
 Stretch-goal TODOs:
 
@@ -53,7 +54,6 @@ Stretch-goal TODOs:
 - Look into frequency chord identification 
 - Cleanup / polish UI
 - Build platform-agnostic executables 
-- Clean reorg code. Folder structure and splitting up AppContext for starters.  
-
-
+- Clean / reorg code
+- Re-add sheet music support with correct note feedback
 

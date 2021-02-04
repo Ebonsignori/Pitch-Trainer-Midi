@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { THEME_BORDER_COLOR } from '../../constants/styleConstants'
 import DropdownForm from '../forms/DropdownForm'
@@ -49,6 +49,9 @@ function OutputOptions () {
   const [instrumentsLoading, setInstrumentsLoading] = useState(false)
   const [instrumentReady, setInstrumentReady] = useState(false)
   const [soundsLoading, setSoundsLoading] = useState(false)
+  const [successSoundPlaying, setSuccessSoundPlaying] = useState(false)
+  const [failSoundPlaying, setFailSoundPlaying] = useState(false)
+  const [testSongPlaying, setTestSongPlaying] = useState(false)
 
   const selectedInstrument = getSelectedSetting(appState.outputSoundsOpt, true) || DEFAULT_INSTRUMENT
   const selectedSuccessSound = getSelectedSetting(appState.successSoundsOpt, true) || DEFAULT_SUCCESS_SOUND
@@ -64,6 +67,13 @@ function OutputOptions () {
     setInstrumentReady(false)
     setInstrumentsLoading(true)
   }
+
+  // On unmount, refresh
+  useEffect(() => {
+    return () => {
+      refreshInputs()
+    }
+  }, [])
 
   if (!previousInstrument) {
     previousInstrument = selectedInstrument
@@ -141,7 +151,14 @@ function OutputOptions () {
         <>
         <DropdownForm isCompound title='Success Sound' stateValues={appState.successSoundsOpt} setValues={appState.setSuccessSoundsOpt} />
         {instrumentReady
-          ? <GreenBtn small onClick={() => game.playSuccessSound()} >Test Sound</GreenBtn>
+          ? <GreenBtn small disabled={successSoundPlaying} onClick={async () => {
+            if (successSoundPlaying) {
+              return
+            }
+            setSuccessSoundPlaying(true)
+            await game.playSuccessSound()
+            setSuccessSoundPlaying(false)
+          }} >Test Sound</GreenBtn>
           : (
             <ExplanationWrapper>
               <ExplanatoryText>
@@ -157,7 +174,14 @@ function OutputOptions () {
         <>
         <DropdownForm isCompound title='Fail Sound' stateValues={appState.failSoundsOpt} setValues={appState.setFailSoundsOpt} />
         {instrumentReady
-          ? <GreenBtn small onClick={() => game.playFailSound()} >Test Sound</GreenBtn>
+          ? <GreenBtn small disabled={failSoundPlaying} onClick={async () => {
+            if (failSoundPlaying) {
+              return
+            }
+            setFailSoundPlaying(true)
+            await game.playFailSound()
+            setFailSoundPlaying(false)
+          }}>Test Sound</GreenBtn>
           : (
             <ExplanationWrapper>
               <ExplanatoryText>
@@ -188,7 +212,14 @@ function OutputOptions () {
                 <>
                   <DropdownForm isCompound title='Instrument Sound' stateValues={appState.outputSoundsOpt} setValues={appState.setOutputSoundsOpt} />
                   {instrumentReady
-                    ? <GreenBtn small onClick={() => game.playTestSong()} >Test Instrument</GreenBtn>
+                    ? <GreenBtn small disabled={testSongPlaying} onClick={async () => {
+                      if (testSongPlaying) {
+                        return
+                      }
+                      setTestSongPlaying(true)
+                      await game.playTestSong()
+                      setTestSongPlaying(false)
+                    }} >Test Instrument</GreenBtn>
                     : (
                       <ExplanationWrapper>
                         <ExplanatoryText>

@@ -9,6 +9,7 @@ onmessage = e => {
   postMessage(analyseAudioData(e.data))
 }
 
+console.log('worker started')
 function analyseAudioData ({ sampleRate, audioData }) {
   const detectPitch = Pitchfinder.YIN({ sampleRate })
   const frequencies = Pitchfinder.frequencies(detectPitch, audioData)

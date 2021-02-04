@@ -6,6 +6,8 @@ import { getPiano } from '../utils/instruments'
 import { getSelectedSetting, getSelectedSettings } from '../utils/settings'
 import { getSuccessPlayer, getFailPlayer } from '../utils/sounds'
 
+const { SOUND_PLAY_TIME } = process.env
+
 class Game {
   constructor (
     appState,
@@ -282,14 +284,14 @@ class Game {
   // Sound effects
   // - - -
   async getSuccessPlayer () {
-    if (this.successSoundOption && !this._successPlayer) {
+    if (!this._successPlayer) {
       this._successPlayer = await getSuccessPlayer(this.successSoundOption)
     }
     return this._successPlayer
   }
 
   async getFailPlayer () {
-    if (this.failSoundOption && !this._failPlayer) {
+    if (!this._failPlayer) {
       this._failPlayer = await getFailPlayer(this.failSoundOption)
     }
     return this._failPlayer
@@ -300,9 +302,11 @@ class Game {
       console.error('Init players before trying to play sounds')
     }
     const donePlaying = new Promise((resolve, reject) => {
-      this._successPlayer.onstop(() => {
+      setTimeout(() => {
+        this._successPlayer.stop()
+        this._failPlayer.stop()
         resolve(true)
-      })
+      }, SOUND_PLAY_TIME)
     })
     this._successPlayer.start()
     return donePlaying
@@ -313,9 +317,10 @@ class Game {
       console.error('Init players before trying to play sounds')
     }
     const donePlaying = new Promise((resolve, reject) => {
-      this._failPlayer.onstop(() => {
+      setTimeout(() => {
+        this._failPlayer.stop()
         resolve(true)
-      })
+      }, SOUND_PLAY_TIME)
     })
     this._failPlayer.start()
     return donePlaying

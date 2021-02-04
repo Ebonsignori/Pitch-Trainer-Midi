@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import ToggleForm from '../forms/ToggleForm'
 import RadioForm from '../forms/RadioForm'
@@ -89,6 +89,13 @@ function InputOptions () {
     setMicDevicesLoading(true)
     setMicrophoneLoading(true)
   }
+
+  // On unmount, refresh
+  useEffect(() => {
+    return () => {
+      refreshInputs()
+    }
+  }, [])
 
   if (!previousMic) {
     previousMic = selectedMicDevice

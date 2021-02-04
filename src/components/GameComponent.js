@@ -168,6 +168,7 @@ let microphone
 let isUsingMic = null
 let noteDisplayOpt = null
 let countDownInterval = null
+let initialNotePlayed = false
 
 function Game () {
   useEffect(() => {
@@ -180,12 +181,14 @@ function Game () {
       noteDisplayOpt = null
       clearInterval(countDownInterval)
       countDownInterval = null
+      initialNotePlayed = false
     }
   }, [])
 
   const appState = useContext(AppContext)
   const [gameState, setGameState] = useState(PLAYING_STATE)
-  const [gameIsLoading, setGameIsLoading] = useState(true)
+  const [gameObjectLoading, setGameObjectLoading] = useState(true)
+  const [microphoneLoading, setMicrophoneLoading] = useState(true)
   const [noteDisplayIsLoading, setNoteDisplayIsLoading] = useState(true)
   const [notePlayed, setNotePlayed] = useState(null)
   const [answerResult, setAnswerResult] = useState(CORRECT)
@@ -216,9 +219,13 @@ function Game () {
     }
     setGameState(ANSWERED_STATE)
     if (isWrong) {
-      gameObject.playFailSound()
       setAnswerResult(WRONG)
       setNumberWrong((prevWrong) => prevWrong + 1)
+      if (appState.playFailSoundOpt) {
+        setRepeating(true)
+        await gameObject.playFailSound()
+        setRepeating(false)
+      }
       if (appState.repeatOnWrongOpt) {
         setRepeating(true)
         await gameObject.onReplay(true)
@@ -266,6 +273,9 @@ function Game () {
         setNoteDisplayIsLoading,
         setNotePlayed
       )
+      gameObject.instrumentReady().then(() => {
+        setGameObjectLoading(false)
+      })
     }
   }
 
@@ -288,12 +298,6 @@ function Game () {
     noteDisplayOpt = getSelectedSetting(appState.startNoteDisplayOpt)
   }
 
-  // TODO: remove if MIDI requires loading
-  if (!isUsingMic && gameIsLoading) {
-    setGameIsLoading(false)
-    gameObject.onNext()
-  }
-
   if (isUsingMic && !microphone && gameObject) {
     const selectedMicDevice = getSelectedSetting(appState.micDeviceOpt, true)
     microphone = new Microphone(
@@ -303,14 +307,17 @@ function Game () {
     )
     microphone.init().then(() => {
       microphone.listen()
-      setGameIsLoading(false)
-      // Play first note
-      gameObject.onNext()
+      setMicrophoneLoading(false)
     })
   }
 
-  if (gameIsLoading) {
+  if ((isUsingMic && microphoneLoading) || gameObjectLoading) {
     return 'Loading...'
+  }
+
+  if (!initialNotePlayed) {
+    initialNotePlayed = true
+    gameObject.onNext()
   }
 
   let NotePlayedDisplay = null

@@ -95,7 +95,6 @@ class SheetMusic extends Component {
     }
     // const cleffedVoices = this.moveToClefs(voices)
     voices.forEach((voice) => this.fillInRemainderWithRests(voice))
-    console.log(voices)
     return [clef, voices]
   }
 
