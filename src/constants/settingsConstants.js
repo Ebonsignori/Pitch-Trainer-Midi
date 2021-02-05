@@ -149,5 +149,55 @@ NOTE_OPTS.forEach(note => {
   FIXED_ROOT[note] = false
 })
 
+// Keys
+// Intervals
+export const MAJOR = 'Major'
+export const MAJOR_PENTATONIC = 'Major Pentatonic'
+export const MINOR = 'Minor'
+export const MINOR_PENTATONIC = 'Minor Pentatonic'
+export const MELODIC_MINOR = 'Melodic Minor'
+export const NATURAL_MINOR = 'Natural Minor'
+export const DORIAN = 'Dorian'
+export const PHRYGIAN = 'Phrygian'
+export const LYDIAN = 'Lydian'
+export const MIXOLYDIAN = 'Mixolydian'
+export const LOCRIAN = 'Locrian'
+
+export const KEY_SIGNATURE_OPTS = [
+  MAJOR,
+  MAJOR_PENTATONIC,
+  MINOR,
+  MINOR_PENTATONIC,
+  MELODIC_MINOR,
+  NATURAL_MINOR,
+  DORIAN,
+  PHRYGIAN,
+  LYDIAN,
+  MIXOLYDIAN,
+  LOCRIAN,
+]
+
+export const KEY_SIGNATURES_SELECTED = {}
+KEY_SIGNATURE_OPTS.forEach(keySignature => {
+  KEY_SIGNATURES_SELECTED[keySignature] = true
+})
+
+export const KEY_TO_SEMITONES = {
+  [MAJOR]: [0, 2, 4, 5, 7, 9, 11, 12],
+  [MAJOR_PENTATONIC]: [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24],
+  [MINOR]: [0, 2, 3, 5, 7, 8, 10, 12],
+  [MINOR_PENTATONIC]: [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24],
+  [MELODIC_MINOR]: [0, 2, 3, 5, 7, 9, 11, 12],
+  [NATURAL_MINOR]: [0, 2, 3, 5, 7, 8, 11, 12],
+  [DORIAN]: [0, 2, 3, 5, 7, 9, 10, 12],
+  [PHRYGIAN]: [0, 1, 3, 5, 7, 8, 10, 12],
+  [LYDIAN]: [0, 2, 4, 6, 7, 9, 11, 12],
+  [MIXOLYDIAN]: [0, 2, 4, 5, 7, 9, 10, 12],
+  [LOCRIAN]: [0, 1, 3, 5, 6, 8, 10, 12],
+}
+
+// Note durations
+export const NOTE_DURATIONS = ['2n', '4n', '8n']
+
 // Nuber of questions
 export const INFINITE = 'Infinite'

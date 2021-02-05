@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { THEME_SPLASH_COLOR } from '../../constants/styleConstants'
 
 const NotesContainer = styled.div`
   display: flex;
@@ -13,14 +12,14 @@ const NotesContainer = styled.div`
 
 const Note = styled.div`
   font-size: 2.5vw;
-  color: ${props => props.correct ? 'green' : THEME_SPLASH_COLOR};
+  color: ${props => props.correct ? 'green' : 'black'};
   margin: 1vw;
 `
 
 const HarmonicContainer = styled.div`
   display: flex;
   flex-direction: column;
-  color: ${props => props.correct ? 'green' : THEME_SPLASH_COLOR};
+  color: ${props => props.correct ? 'green' : 'black'};
 `
 
 const HarmonicNote = styled.div`
@@ -30,13 +29,14 @@ const HarmonicNote = styled.div`
 
 function NoteStrings ({
   notes,
-  correctIndex
+  correctIndex,
+  wasWrong
 }) {
   const RenderedNotes = notes.map((note, index) => {
     if (Array.isArray(note)) {
       const harmonicNotes = note.map((notePart, index) => {
         // Only show "root" of harmonic note when note already played
-        if (index >= correctIndex && index > 0) {
+        if ((index >= correctIndex && index > 0) || wasWrong) {
           return (
             <HarmonicNote key={`harmonic-${notePart}-${index}}`}>
               ?
@@ -57,8 +57,8 @@ function NoteStrings ({
       )
     }
     return (
-      <Note correct={index < correctIndex} key={`${note}-${index}`}>
-        {(index < correctIndex || index === 0) ? note : '?'}
+      <Note correct={index < correctIndex && !wasWrong} key={`${note}-${index}`}>
+        {(index < correctIndex || index === 0 || wasWrong) ? note : '?'}
       </Note>
     )
   })

@@ -13,6 +13,7 @@ import IntervalOptions from './option_tabs/IntervalOptions'
 import GlobalOptions from './option_tabs/GlobalOptions'
 import InputOptions from './option_tabs/InputOptions'
 import OutputOptions from './option_tabs/OutputOptions'
+import MelodyOptions from './option_tabs/MelodyOptions'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -62,7 +63,8 @@ const Tab = styled.span`
   }
 
   :hover {
-    cursor: pointer;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    background-color: ${THEME_BORDER_COLOR};
     opacity: .8;
   }
 `
@@ -73,10 +75,10 @@ function Options () {
   let RenderedGameOptionsTab
   if (gameOptionsTab === INTERVALS) {
     RenderedGameOptionsTab = <IntervalOptions />
-  } else if (gameOptionsTab === CHORDS) {
-    RenderedGameOptionsTab = 'Chords are still under development'
+  // } else if (gameOptionsTab === CHORDS) {
+    // RenderedGameOptionsTab = 'Chords are still under development'
   } else if (gameOptionsTab === MELODIES) {
-    RenderedGameOptionsTab = 'Melodies are still under development'
+    RenderedGameOptionsTab = <MelodyOptions />
   } else {
     RenderedGameOptionsTab = `Internal Error. Invalid Tab, ${gameOptionsTab}`
   }
@@ -125,7 +127,8 @@ function Options () {
           </Tab>
           <Tab
             selected={gameOptionsTab === CHORDS}
-            onClick={() => setGameOptionsTab(CHORDS)}
+            disabled
+            // onClick={() => setGameOptionsTab(CHORDS)}
           >
             {CHORDS}
           </Tab>

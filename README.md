@@ -6,7 +6,7 @@ Runs through a series of randomized interval, chord, or randomly generated melod
 
 For intervals, frequency detection via a microphone can be used, but for any setting where chords (harmonic) is enabled, MIDI is preferred. Chords must be played out one note at a time (arpeggiated) to be picked up by microphone / frequency detection.
 
-**Note:** Currently only microphone input feedback for Interval mode is supported.
+**Note:** Currently only microphone input feedback for Interval and Melody mode is supported.
 
 ## Demo
 
@@ -39,9 +39,9 @@ Below is a list of TODO items before I'll consider this project "finished":
 
 - MIDI Support: input and game mode feedback
 - ~Fix slow option rendering~
-- Finish melodies game mode
+- ~Finish melodies game mode~
 - Finish chords game mode
-- Fix bugs
+- ~Fix bugs~
 - ~Add note-name starting note display opt implementation~
 - ~Add different instrument options~
 - ~Add correct note played feedback~

@@ -10,8 +10,9 @@ import {
   LOWER_RANGE,
   INPUT_DEVICE_SELECTED,
   START_NOTE_DISPLAY_SELECTED,
+  KEY_SIGNATURES_SELECTED,
 } from './constants/settingsConstants'
-import { GAME_OPTIONS, INTERVALS, RESULTS } from './constants/gameConstants'
+import { CHORDS, GAME_OPTIONS, INTERVALS, MELODIES, RESULTS } from './constants/gameConstants'
 import Results from './components/Results'
 import { loadSettingsJson } from './utils/settings'
 import PromptModal from './components/modal/promptModal'
@@ -21,12 +22,14 @@ import ErrorModule from './components/modal/errorModal'
 const existingSettings = loadSettingsJson()
 
 function App () {
+  // Internal Options
   const [selectedGameMode, setSelectedGameMode] = useState(GAME_OPTIONS)
   // const [selectedGameMode, setSelectedGameMode] = useState(INTERVALS)
-
   // Modal State
   const [promptModalData, setPromptModalData] = useState({})
   const [errorModalData, setErrorModalData] = useState({})
+  // Game results
+  const [gameStats, setGameStats] = useState({})
 
   // Input settings
   const [inputDeviceOpt, setInputDeviceOpt] = useState(existingSettings.inputDeviceOpt || INPUT_DEVICE_SELECTED)
@@ -59,13 +62,17 @@ function App () {
   const [upperRangesOpt, setUpperRangesOpt] = useState(existingSettings.upperRangesOpt || UPPER_RANGE)
   const [lowerRangesOpt, setLowerRangesOpt] = useState(existingSettings.lowerRangesOpt || LOWER_RANGE)
 
-  // Game results
-  const [gameStats, setGameStats] = useState({})
+  // Melody-specific game questions
+  const [numberOfMelodyNotesOpt, setNumberOfMelodyNotesOpt] = useState(existingSettings.numberOfMelodyNotesOpt || 6)
+  const [melodyKeysOpt, setMelodyKeysOpt] = useState(existingSettings.melodyKeysOpt || KEY_SIGNATURES_SELECTED)
+  const [randomizeRythmeOpt, setRandomizeRythmeOpt] = useState(existingSettings.randomizeRythmeOpt || false)
 
   const appState = {
     // Internal State
     selectedGameMode,
     setSelectedGameMode,
+    gameStats,
+    setGameStats,
     // Modal State
     setPromptModalData,
     setErrorModalData,
@@ -108,6 +115,7 @@ function App () {
     setAutoContinueWrongDelayOpt,
     repeatOnWrongOpt,
     setRepeatOnWrongOpt,
+    // Tab options
     numberOfQuestionsOpt,
     setNumberOfQuestionsOpt,
     intervalsOpt,
@@ -120,12 +128,17 @@ function App () {
     setLowerRangesOpt,
     upperRangesOpt,
     setUpperRangesOpt,
-    gameStats,
-    setGameStats,
+    // Melody options
+    numberOfMelodyNotesOpt,
+    setNumberOfMelodyNotesOpt,
+    melodyKeysOpt,
+    setMelodyKeysOpt,
+    randomizeRythmeOpt,
+    setRandomizeRythmeOpt,
   }
 
   let MainRender = <Options />
-  if (selectedGameMode === INTERVALS) {
+  if (selectedGameMode === INTERVALS || selectedGameMode === CHORDS || selectedGameMode === MELODIES) {
     MainRender = <GameComponent />
   } else if (selectedGameMode === RESULTS) {
     MainRender = <Results

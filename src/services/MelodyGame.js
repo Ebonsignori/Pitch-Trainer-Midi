@@ -1,12 +1,17 @@
 import { Interval, Note } from '@tonaljs/tonal'
 import Game from '../services/Game'
-import { ASCENDING, DESCENDING, HARMONIC, INTERVAL_TO_SEMITONE_MAP, NOT_FIXED_ROOT, SEMITONE_TO_INTERVAL_MAP } from '../constants/settingsConstants'
+import { KEY_TO_SEMITONES, NOTE_DURATIONS, NOT_FIXED_ROOT } from '../constants/settingsConstants'
+import { getSelectedSettings } from '../utils/settings'
 
-class IntervalGame extends Game {
+class MelodyGame extends Game {
   constructor (...args) {
     super(...args)
-    // Interval Game specific settings
-    this.playMode = ASCENDING
+    const appState = args[0]
+    // Melody Game specific settings
+    this.keysSelected = getSelectedSettings(appState.melodyKeysOpt)
+    this.numberOfMelodyNotes = appState.numberOfMelodyNotesOpt
+    this.randomizeRythme = appState.randomizeRythmeOpt
+    this.keySignature = ''
   }
 
   // Generate ascending, descending, or harmonic intervals
@@ -21,36 +26,21 @@ class IntervalGame extends Game {
       this.shuffleNotes()
       this.currentStartingNoteIndex = 0
     }
-    // Get starting note of interval
+    // Get starting note of melody
     if (this.fixedRoot !== NOT_FIXED_ROOT) {
       this.songNotes.push(this.fixedRoot)
     } else {
       this.songNotes.push(this.noteOptions[this.currentStartingNoteIndex++])
     }
 
-    // Get random interval
-    const intervalName = this.getRandomFromArr(this.intervalsSelected)
-    let intervalSemiTone = INTERVAL_TO_SEMITONE_MAP[intervalName]
-
     // Randomize playMode
-    this.playMode = this.getRandomFromArr(this.playModes)
-
-    // Invert interval if descending
-    if (this.playMode === DESCENDING) {
-      intervalSemiTone = -intervalSemiTone
-    }
-    // Add second note to song
-    const interval = Interval.fromSemitones(intervalSemiTone)
-    const nextNote = this.noteToSharp(Note.transpose(this.songNotes[0], interval))
-    if (this.playMode === HARMONIC) {
-      const rootNote = this.songNotes[0]
-      this.songNotes[0] = [rootNote, nextNote]
-    } else {
+    this.keySignature = this.getRandomFromArr(this.keysSelected)
+    for (let noteIndex = 0; noteIndex < this.numberOfMelodyNotes; noteIndex++) {
+      const nextNoteSemiTone = this.getRandomFromArr(KEY_TO_SEMITONES[this.keySignature])
+      const interval = Interval.fromSemitones(nextNoteSemiTone)
+      const nextNote = this.noteToSharp(Note.transpose(this.songNotes[0], interval))
       this.songNotes.push(nextNote)
     }
-
-    // Get interval string
-    this.interval = SEMITONE_TO_INTERVAL_MAP[Math.abs(intervalSemiTone)]
 
     // Reload state
     this.setNoteDisplayIsLoading(false)
@@ -61,13 +51,14 @@ class IntervalGame extends Game {
     const song = []
     for (const noteOrNotes of this.songNotes) {
       let duration = '4n'
-      if (Array.isArray(noteOrNotes)) {
-        duration = '2n'
+      if (this.randomizeRythme) {
+        duration = this.getRandomFromArr(NOTE_DURATIONS)
       }
+      console.log(duration)
       song.push({ note: noteOrNotes, duration })
     }
     return this.playSong(song)
   }
 }
 
-export default IntervalGame
+export default MelodyGame

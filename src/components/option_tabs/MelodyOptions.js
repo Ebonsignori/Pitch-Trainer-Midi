@@ -5,9 +5,10 @@ import CheckboxForm from '../forms/CheckboxForm'
 import DropdownForm from '../forms/DropdownForm'
 import { GreenBtn } from '../Buttons'
 import { THEME_BORDER_COLOR } from '../../constants/styleConstants'
-import { INTERVALS } from '../../constants/gameConstants'
+import { MELODIES } from '../../constants/gameConstants'
 import NumberForm from '../forms/NumberForm'
 import { saveAllSettings } from '../../utils/settings'
+import ToggleForm from '../forms/ToggleForm'
 
 const SelectedTabWrapper = styled.div`
   display: flex;
@@ -56,30 +57,28 @@ const ExplanatoryText = styled.div`
   justify-content: start;
 `
 
-function IntervalOptions () {
+function MelodyOptions () {
   const appState = useContext(AppContext)
   return (
     <SelectedTabWrapper>
       <SelectedTabRow>
         <ExplanationWrapper>
           <ExplanatoryTitle>
-            Interval Recognition Mode
+            Melody Playback Mode
           </ExplanatoryTitle>
           <ExplanatoryText>
-            In this game mode, the intervals you select will be played randomly and you must play them back to get the question correct.
-           Intervals can be played ascending (up), descending (down), harmonic (same time) modes depending on selections.
+            In this game mode, a random melody will be played using the selections below. You must play back the melody in the same order it was played to get it correct.
           </ExplanatoryText>
         </ExplanationWrapper>
       </SelectedTabRow>
       <SelectedTabRow>
         <SelectedTabColumn>
             <NumberForm title='Number of Questions' units='Empty for infinite' stateValue={appState.numberOfQuestionsOpt} setValue={appState.setNumberOfQuestionsOpt} canBeInfinite />
+            <NumberForm title='Number of melody notes' units='1-12 to play' stateValue={appState.numberOfMelodyNotesOpt} setValue={appState.setNumberOfMelodyNotesOpt} min={1} max={12} />
+          <ToggleForm title='Randomize Rythme?' stateValue={appState.randomizeRythmeOpt} setValue={appState.setRandomizeRythmeOpt} />
         </SelectedTabColumn>
         <SelectedTabColumn>
-          <CheckboxForm title='Intervals' stateValues={appState.intervalsOpt} setValues={appState.setIntervalsOpt} />
-        </SelectedTabColumn>
-        <SelectedTabColumn>
-          <CheckboxForm title='Play Modes' stateValues={appState.playModesOpt} setValues={appState.setPlayModesOpt} />
+          <CheckboxForm title='Keys' stateValues={appState.melodyKeysOpt} setValues={appState.setMelodyKeysOpt} />
         </SelectedTabColumn>
         <SelectedTabColumn>
           <DropdownForm title='Fixed Root Note' stateValues={appState.fixedRootOpt} setValues={appState.setFixedRootOpt} />
@@ -90,11 +89,11 @@ function IntervalOptions () {
       <SelectedTabRow style={{ marginLeft: '3vw' }}>
         <GreenBtn onClick={() => {
           saveAllSettings(appState)
-          appState.setSelectedGameMode(INTERVALS)
-        }}>Start Interval Mode</GreenBtn>
+          appState.setSelectedGameMode(MELODIES)
+        }}>Start Melody Mode</GreenBtn>
       </SelectedTabRow>
     </SelectedTabWrapper>
   )
 }
 
-export default IntervalOptions
+export default MelodyOptions

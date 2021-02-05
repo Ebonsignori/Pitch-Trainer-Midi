@@ -15,13 +15,15 @@ class Game {
     updateTotals,
     setRepeating,
     setNoteDisplayIsLoading,
-    setNotePlayed
+    setNotePlayed,
+    setAnswerResult,
   ) {
     this.setGameState = setGameState
     this.setRepeating = setRepeating
     this.updateTotals = updateTotals
     this.setNoteDisplayIsLoading = setNoteDisplayIsLoading
     this.setNotePlayed = setNotePlayed
+    this.setAnswerResult = setAnswerResult
 
     // Set up Tone.js
     Tone.Transport.bpm.value = appState.tempoOpt || 80
@@ -44,6 +46,7 @@ class Game {
 
     // We don't want the second note of our interval to go above / below our note boundaries
     const highestIntervalSelected = INTERVAL_OPTS.indexOf(this.intervalsSelected[this.intervalsSelected.length - 1]) + 1
+    // TODO: We don't want our melody root to go above / below either
     this.lowestNote = Note.fromMidiSharps(
       Note.get(getSelectedSetting(appState.lowerRangesOpt)).midi + highestIntervalSelected
     )
@@ -165,7 +168,7 @@ class Game {
       return
     }
     // Use certain notes out of range as repeat commands
-    if (notes[0] === 'B0') {
+    if (notes[0] === 'B0' || notes[0] === 'B1') {
       return this.onReplay()
     }
     const correctNote = this.songNotes[this.correctIndex]
@@ -207,6 +210,7 @@ class Game {
   // Game flow logic
   // - - -
   async onNext () {
+    this.setAnswerResult(null)
     let wasResultState = false
     const currentState = await this.getCurrentState()
     if (currentState === RESULTS) {

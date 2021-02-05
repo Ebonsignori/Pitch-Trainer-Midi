@@ -32,6 +32,9 @@ const SETTINGS_KEYS = [
   'fixedRootOpt',
   'lowerRangesOpt',
   'upperRangesOpt',
+  'numberOfMelodyNotesOpt',
+  'melodyKeysOpt',
+  'randomizeRythmeOpt'
 ]
 
 // Extract each setting from appState and save it to JSON

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Piano } from 'react-piano'
 import { PianoStyle } from './note_display/pianoStyle'
 import AppContext from '../AppContext'
-import { ANSWERED_STATE, INTERVALS, LISTENING_STATE, PLAYING_STATE, RESULTS } from '../constants/gameConstants'
+import { ANSWERED_STATE, CHORDS, INTERVALS, LISTENING_STATE, MELODIES, PLAYING_STATE, RESULTS } from '../constants/gameConstants'
 import { INFINITE, MICROPHONE_DEVICE, NOTE_DISPLAY, PIANO_DISPLAY, SHEET_MUSIC_DISPLAY } from '../constants/settingsConstants'
 import { THEME_SPLASH_COLOR } from '../constants/styleConstants'
 import IntervalGame from '../services/IntervalGame'
@@ -13,6 +13,7 @@ import { Note } from '@tonaljs/tonal'
 import Microphone from '../utils/microphone'
 import { getSelectedSetting } from '../utils/settings'
 import NoteStrings from './note_display/NoteStrings'
+import MelodyGame from '../services/MelodyGame'
 
 const PageWrapper = styled.div`
   display: flex;
@@ -110,7 +111,7 @@ const AnswerResult = styled.div`
   color: ${props => props.correct ? 'green' : 'red'};
 `
 
-const IntervalResult = styled.div`
+const QuestionTypeResult = styled.div`
   font-size: 2.5vw;
   font-weight: 900;
 `
@@ -167,7 +168,8 @@ let gameObject
 let microphone
 let isUsingMic = null
 let noteDisplayOpt = null
-let countDownInterval = null
+let countDownInterval = null // setInterval interval
+let questionType = null // e.g. interval, keySignature, chord, etc
 
 function Game () {
   useEffect(() => {
@@ -184,6 +186,7 @@ function Game () {
         clearInterval(countDownInterval)
       }
       countDownInterval = null
+      questionType = null
     }
   }, [])
 
@@ -193,7 +196,7 @@ function Game () {
   const [microphoneLoading, setMicrophoneLoading] = useState(true)
   const [noteDisplayIsLoading, setNoteDisplayIsLoading] = useState(true)
   const [notePlayed, setNotePlayed] = useState(null)
-  const [answerResult, setAnswerResult] = useState(CORRECT)
+  const [answerResult, setAnswerResult] = useState(null)
   const [numberCorrect, setNumberCorrect] = useState(0)
   const [numberWrong, setNumberWrong] = useState(0)
   const [countDownSecond, setCountDownSecond] = useState(0)
@@ -266,20 +269,38 @@ function Game () {
   }
 
   if (!gameObject) {
-    if (appState.selectedGameMode === INTERVALS) {
-      gameObject = new IntervalGame(
-        appState,
-        setGameState,
-        updateTotals,
-        setRepeating,
-        setNoteDisplayIsLoading,
-        setNotePlayed
-      )
-      gameObject.instrumentReady().then(() => {
-        setGameObjectLoading(false)
-        gameObject.onNext()
-      })
+    const GameClass = ((mode) => {
+      switch (mode) {
+        case INTERVALS:
+          questionType = 'interval'
+          return IntervalGame
+        case CHORDS:
+          questionType = 'chord'
+          return null
+        case MELODIES:
+          questionType = 'keySignature'
+          return MelodyGame
+        default:
+          return null
+      }
+    })(appState.selectedGameMode)
+    if (!GameClass) {
+      console.error('Invalid gamemode', appState.selectedGameMode)
+      // TODO: Exit
     }
+    gameObject = new GameClass(
+      appState,
+      setGameState,
+      updateTotals,
+      setRepeating,
+      setNoteDisplayIsLoading,
+      setNotePlayed,
+      setAnswerResult
+    )
+    gameObject.instrumentReady().then(() => {
+      setGameObjectLoading(false)
+      gameObject.onNext()
+    })
   }
 
   const nextQuestion = () => {
@@ -359,7 +380,7 @@ function Game () {
       const activeNotes = []
       if (gameObject && gameObject.songNotes && gameObject.songNotes.length) {
         for (let i = 0; i < gameObject.songNotes.length; i++) {
-          if (i < gameObject.correctIndex || i === 0) {
+          if (i < gameObject.correctIndex || i === 0 || answerResult === WRONG) {
             activeNotes.push(Note.get(gameObject.songNotes[i]).midi)
           }
         }
@@ -392,6 +413,7 @@ function Game () {
           notes={gameObject.songNotes}
           correctIndex={gameObject.correctIndex}
           correctHarmonics={gameObject.correctHarmonics}
+          wasWrong={answerResult === WRONG}
         />
       )
     }
@@ -399,11 +421,11 @@ function Game () {
 
   let StatusDisplay = <Listening>{gameState}</Listening>
   let NextBtnDisplay = <ThemeBtn onClick={() => updateTotals(true, gameObject)}>Skip</ThemeBtn>
-  let IntervalDisplay = <IntervalResult>?</IntervalResult>
+  let QuestionTypeDisplay = <QuestionTypeResult>?</QuestionTypeResult>
   if (gameState === LISTENING_STATE) {
     StatusDisplay = <Playing>{gameState}</Playing>
   } else if (gameState === ANSWERED_STATE) {
-    IntervalDisplay = <IntervalResult>{gameObject.interval}</IntervalResult>
+    QuestionTypeDisplay = <QuestionTypeResult>{gameObject[questionType]}</QuestionTypeResult>
     StatusDisplay = <AnswerResult correct={answerResult === CORRECT}>{answerResult}</AnswerResult>
     NextBtnDisplay = (
     <GreenBtn onClick={nextQuestion}>Next</GreenBtn>
@@ -430,7 +452,7 @@ function Game () {
         {StatusDisplay}
       </StateRow>
       <InfoRow>
-        {IntervalDisplay}
+        {QuestionTypeDisplay}
       </InfoRow>
       {repeating && (
       <StateRow>
